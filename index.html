@@ -3,26 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>日語單字卡 N4</title>
+<title>標準日本語 單字卡</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
   :root {
-    --bg: #ffffff;
-    --bg2: #f7f7f7;
-    --ink: #1a1a1a;
-    --muted: #888;
-    --border: #e0e0e0;
-    --accent: #2c5f8a;
-    --accent2: #e8f0f8;
-    --ruby: #555;
-    --progress: #2c5f8a;
+    --bg:       #F6EDE1;
+    --bg2:      #EDE3D4;
+    --card:     #FDFAF5;
+    --ink:      #1E1611;
+    --ink-mid:  #3C2E24;
+    --muted:    #8A7B6E;
+    --ring:     rgba(30,22,17,0.08);
+    --ring-sm:  rgba(30,22,17,0.05);
+    --shu:      #B5380F;
+    --shu-bg:   #F5E2DA;
+    --kon:      #1E3A6E;
+    --yama:     #C48C0A;
+    --ruby:     #9A3818;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    font-feature-settings: 'ss02' 0;
     background: var(--bg2);
     color: var(--ink);
     min-height: 100vh;
@@ -33,308 +38,249 @@
 
   /* HEADER */
   .header {
-    width: 100%;
-    max-width: 480px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    width: 100%; max-width: 480px;
+    background: var(--card);
+    padding: 13px 20px;
+    display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 0 0 1px var(--ring), 0 2px 12px rgba(30,22,17,0.06);
   }
-  .header-title { font-size: 1rem; font-weight: 500; letter-spacing: 0.05em; }
-  .header-counter { font-size: 0.8rem; color: var(--muted); }
-  .header-right { display: flex; align-items: center; gap: 10px; }
+  .header-left { display: flex; align-items: baseline; gap: 8px; }
+  .header-title { font-size: 0.92rem; font-weight: 600; letter-spacing: -0.01em; }
+  .header-sub { font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+  .header-counter {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em;
+  }
 
-  /* PROGRESS BAR */
-  .progress-bar {
-    width: 100%;
-    max-width: 480px;
-    height: 3px;
-    background: var(--border);
+  /* PROGRESS */
+  .progress-bar { width: 100%; max-width: 480px; height: 2px; background: rgba(30,22,17,0.06); }
+  .progress-fill { height: 100%; background: var(--shu); transition: width 0.4s ease; }
+
+  /* LESSON FILTER */
+  .lesson-filter {
+    width: 100%; max-width: 480px;
+    background: var(--card);
+    display: flex; gap: 2px; padding: 0 12px;
+    overflow-x: auto; scrollbar-width: none;
+    border-bottom: 1px solid rgba(30,22,17,0.06);
+    -webkit-overflow-scrolling: touch;
   }
-  .progress-fill {
-    height: 100%;
-    background: var(--progress);
-    transition: width 0.4s ease;
+  .lesson-filter::-webkit-scrollbar { display: none; }
+  .lbtn {
+    flex-shrink: 0; padding: 9px 11px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); background: none; border: none; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
   }
+  .lbtn.active { color: var(--shu); border-bottom-color: var(--shu); font-weight: 600; }
 
   /* CARD */
-  .card-wrap {
-    width: 100%;
-    max-width: 480px;
-    padding: 0;
-    flex: 1;
-  }
+  .card-wrap { width: 100%; max-width: 480px; padding: 16px; flex: 1; }
+
+  @keyframes cardIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
 
   .card {
-    background: var(--bg);
-    min-height: 70vh;
-    padding: 32px 28px 24px;
-    position: relative;
+    background: var(--card); border-radius: 16px;
+    padding: 22px 22px 20px; position: relative;
+    box-shadow: 0 0 0 1px var(--ring), 0 8px 28px rgba(30,22,17,0.09);
+    min-height: 58vh; animation: cardIn 0.22s ease;
   }
 
-  /* WORD SECTION */
-  .word-reading {
-    font-size: 0.75rem;
-    color: var(--ruby);
-    letter-spacing: 0.08em;
-    margin-bottom: 4px;
-    font-weight: 300;
+  .card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
   }
-
-  .word-main {
-    font-size: 2.6rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    margin-bottom: 10px;
-    cursor: pointer;
+  .lesson-badge { display: flex; align-items: center; gap: 5px; }
+  .lesson-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
   }
-  .word-main:hover { opacity: 0.8; }
-
-  .word-main ruby { display: ruby; }
-  .word-main ruby rt {
-    display: ruby-text;
-    font-size: 0.35em;
-    font-weight: 400;
-    color: var(--ruby);
-    letter-spacing: 0.06em;
+  .lesson-pill {
+    background: var(--shu-bg); color: var(--shu);
+    padding: 2px 9px; border-radius: 999px;
+    font-family: 'Courier New', monospace; font-size: 0.6rem; letter-spacing: 0.06em;
+    box-shadow: inset 0 0 0 1px rgba(181,56,15,0.14);
   }
-
-  .word-meta {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .word-meaning {
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--ink);
-    margin-bottom: 28px;
-  }
-
-  /* DIVIDER */
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0 0 24px;
-  }
-
-  /* SENTENCE SECTION */
-  .sentence-label {
-    font-size: 0.68rem;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .sentence-jp {
-    font-size: 1.15rem;
-    font-weight: 400;
-    line-height: 2.4;
-    margin-bottom: 8px;
-    cursor: pointer;
-    letter-spacing: 0.03em;
-  }
-  .sentence-jp:hover { opacity: 0.75; }
-
-  .sentence-jp ruby { display: ruby; margin: 0 0.5px; }
-  .sentence-jp ruby rt {
-    display: ruby-text;
-    font-size: 0.48em;
-    font-weight: 300;
-    color: var(--ruby);
-    letter-spacing: 0.04em;
-  }
-
-  .sentence-meaning {
-    font-size: 0.88rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  /* PLAY STATUS */
-  .play-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 20px;
-    min-height: 28px;
-  }
-  .play-dots { display: flex; gap: 5px; }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--border);
-    transition: background 0.2s;
-  }
-  .dot.active { background: var(--accent); }
-  .dot.done { background: #aac8e4; }
-  .play-status-text {
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-  }
-
-  /* BOTTOM CONTROLS */
-  .controls {
-    width: 100%;
-    max-width: 480px;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 16px 20px;
-    position: sticky;
-    bottom: 0;
-  }
-
-  .controls-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .loop-toggle {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 0.75rem;
-    color: var(--muted);
-    cursor: pointer;
-    user-select: none;
-  }
-  .loop-toggle input { display: none; }
-  .toggle-track {
-    width: 36px; height: 20px;
-    background: var(--border);
-    border-radius: 10px;
-    position: relative;
-    transition: background 0.2s;
-  }
-  .toggle-track::after {
-    content: '';
-    position: absolute;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: white;
-    top: 3px; left: 3px;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-  .loop-toggle input:checked + .toggle-track { background: var(--accent); }
-  .loop-toggle input:checked + .toggle-track::after { transform: translateX(16px); }
-  .loop-toggle.active { color: var(--accent); }
-
-  .speed-group {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .speed-label-sm { font-size: 0.7rem; color: var(--muted); }
-  .speed-btn {
-    font-size: 0.68rem;
-    padding: 3px 10px;
-    border: 1px solid var(--border);
-    background: transparent;
-    cursor: pointer;
-    color: var(--muted);
-    border-radius: 20px;
-    transition: all 0.12s;
-    font-family: 'Noto Sans JP', sans-serif;
-  }
-  .speed-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-
-  .nav-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .btn-nav {
-    flex: 1;
-    padding: 12px;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    cursor: pointer;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .btn-nav:hover { background: var(--bg2); }
-  .btn-nav:active { transform: scale(0.97); }
-
-  .btn-play-main {
-    flex: 2;
-    padding: 12px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    font-family: 'Noto Sans JP', sans-serif;
-    border-radius: 8px;
-    transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    letter-spacing: 0.04em;
-  }
-  .btn-play-main:hover { background: #1e4a6e; }
-  .btn-play-main:active { transform: scale(0.98); }
-  .btn-play-main.playing { background: #e07b39; }
-  .btn-play-main.playing:hover { background: #c06020; }
-
-  /* LOOP INDICATOR */
   .loop-badge {
-    position: absolute;
-    top: 14px; right: 14px;
-    font-size: 0.62rem;
-    padding: 2px 8px;
-    background: var(--accent2);
-    color: var(--accent);
-    border-radius: 20px;
-    letter-spacing: 0.08em;
-    display: none;
+    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    padding: 2px 8px; background: var(--shu-bg); color: var(--shu);
+    border-radius: 999px; letter-spacing: 0.06em;
+    box-shadow: inset 0 0 0 1px rgba(181,56,15,0.14); display: none;
   }
   .loop-badge.visible { display: block; }
 
-  /* ANIMATE */
-  @keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
-  .card { animation: fadeIn 0.25s ease; }
+  /* WORD */
+  .word-main {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 2.8rem; font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.2; cursor: pointer; color: var(--ink); margin-bottom: 4px;
+  }
+  .word-main:hover { opacity: 0.7; }
+  .word-main ruby { display: ruby; }
+  .word-main ruby rt {
+    display: ruby-text; font-size: 0.28em; font-weight: 400;
+    color: var(--ruby); letter-spacing: 0.04em;
+  }
+
+  .word-meta {
+    font-family: 'Courier New', monospace; font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .word-meaning {
+    font-size: 1.06rem; font-weight: 500; color: var(--ink-mid);
+    margin-bottom: 22px; line-height: 1.65; max-width: 28ch; text-wrap: pretty;
+  }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--ring-sm); margin: 0 0 16px; }
+
+  /* SENTENCE */
+  .sentence-label {
+    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px;
+  }
+  .sentence-jp {
+    font-family: 'Noto Sans JP', sans-serif; font-size: 1.1rem;
+    line-height: 2.6; margin-bottom: 10px; cursor: pointer; letter-spacing: 0.02em;
+  }
+  .sentence-jp:hover { opacity: 0.8; }
+
+  /* KTV */
+  .ktv-token { display: inline; color: var(--muted); opacity: 0.45; transition: color 0.08s, opacity 0.08s; }
+  .ktv-token ruby { display: ruby; }
+  .ktv-token ruby rt {
+    display: ruby-text; font-size: 0.46em; font-weight: 300;
+    color: var(--muted); letter-spacing: 0.04em; transition: color 0.08s;
+  }
+  .ktv-token.ktv-done { color: var(--ink-mid); opacity: 1; font-weight: 500; }
+  .ktv-token.ktv-done ruby rt { color: var(--ruby); }
+  .ktv-token.ktv-now {
+    color: var(--yama); opacity: 1; font-weight: 700;
+    text-shadow: 0 0 10px rgba(196,140,10,0.3);
+  }
+  .ktv-token.ktv-now ruby rt { color: var(--yama); }
+
+  .sentence-meaning { font-size: 0.84rem; color: var(--muted); line-height: 1.75; text-wrap: pretty; }
+
+  /* PLAY STATUS */
+  .play-status { display: flex; align-items: center; gap: 8px; margin-top: 16px; min-height: 22px; }
+  .play-dots { display: flex; gap: 5px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(30,22,17,0.1); transition: background 0.2s; }
+  .dot.active { background: var(--shu); }
+  .dot.done { background: var(--shu-bg); box-shadow: inset 0 0 0 1px rgba(181,56,15,0.2); }
+  .play-status-text {
+    font-family: 'Courier New', monospace; font-size: 0.62rem;
+    color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* CONTROLS */
+  .controls {
+    width: 100%; max-width: 480px; background: var(--card); padding: 13px 18px;
+    position: sticky; bottom: 0;
+    box-shadow: 0 0 0 1px var(--ring), 0 -4px 16px rgba(30,22,17,0.06);
+  }
+  .controls-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+
+  .loop-toggle {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Courier New', monospace; font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted); cursor: pointer; user-select: none;
+  }
+  .loop-toggle input { display: none; }
+  .toggle-track {
+    width: 32px; height: 17px; background: rgba(30,22,17,0.12);
+    border-radius: 9px; position: relative; transition: background 0.2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; width: 11px; height: 11px;
+    border-radius: 50%; background: white; top: 3px; left: 3px;
+    transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .loop-toggle input:checked + .toggle-track { background: var(--shu); }
+  .loop-toggle input:checked + .toggle-track::after { transform: translateX(15px); }
+  .loop-toggle.active { color: var(--shu); }
+
+  .speed-group { display: flex; gap: 4px; align-items: center; }
+  .speed-label-sm {
+    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .speed-btn {
+    height: 26px; padding: 0 10px;
+    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border: 1px solid rgba(30,22,17,0.12); background: transparent;
+    cursor: pointer; color: var(--muted); border-radius: 999px;
+    transition: all 0.12s; display: flex; align-items: center;
+  }
+  .speed-btn.active { background: var(--shu); color: white; border-color: var(--shu); }
+
+  .nav-row { display: flex; align-items: center; gap: 9px; }
+  .btn-nav {
+    flex: 1; height: 38px;
+    border: 1.5px solid rgba(30,22,17,0.12); background: transparent;
+    cursor: pointer; font-size: 0.85rem; border-radius: 999px;
+    transition: all 0.14s; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mid);
+  }
+  .btn-nav:hover { background: var(--bg2); }
+  .btn-nav:active { transform: scale(0.96); }
+
+  .btn-play-main {
+    flex: 2; height: 38px; background: var(--shu); color: white;
+    border: none; cursor: pointer;
+    font-family: 'Courier New', monospace; font-size: 0.72rem; font-weight: 600;
+    border-radius: 999px; transition: all 0.14s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    box-shadow: 0 0 0 1px rgba(181,56,15,0.2);
+  }
+  .btn-play-main:hover { filter: brightness(1.08); }
+  .btn-play-main:active { transform: scale(0.97); }
+  .btn-play-main.playing { background: var(--kon); box-shadow: 0 0 0 1px rgba(30,58,110,0.2); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-title">標準日本語 初級上</div>
-  <div class="header-right">
-    <div class="header-counter" id="headerCounter">1 / 20</div>
+  <div class="header-left">
+    <span class="header-title">標準日本語</span>
+    <span class="header-sub">初級</span>
   </div>
+  <div class="header-counter" id="headerCounter">1 / 20</div>
 </div>
 <div class="progress-bar">
   <div class="progress-fill" id="progressFill" style="width:5%"></div>
 </div>
 
+<div class="lesson-filter" id="lessonFilter">
+  <button class="lbtn active" onclick="filterLesson(0)" id="btnAll">ALL</button>
+</div>
+
 <div class="card-wrap">
   <div class="card" id="card">
-    <div class="loop-badge" id="loopBadge">🔁 輪播中</div>
+    <div class="card-top">
+      <div class="lesson-badge">
+        <span class="lesson-label">課</span>
+        <span class="lesson-pill" id="lessonNum">第 1 課</span>
+      </div>
+      <div class="loop-badge" id="loopBadge">🔁 輪播中</div>
+    </div>
 
-    <!-- WORD -->
     <div class="word-main" id="wordMain" onclick="speakWord()"></div>
     <div class="word-meta" id="wordMeta"></div>
     <div class="word-meaning" id="wordMeaning"></div>
 
     <div class="divider"></div>
 
-    <!-- SENTENCE -->
     <div class="sentence-label">例句</div>
     <div class="sentence-jp" id="sentenceJp" onclick="speakSentence()"></div>
     <div class="sentence-meaning" id="sentenceMeaning"></div>
 
-    <!-- PLAY STATUS (3 dots) -->
     <div class="play-status" id="playStatus" style="display:none">
       <div class="play-dots">
         <div class="dot" id="dot1"></div>
@@ -351,676 +297,193 @@
     <label class="loop-toggle" id="loopLabel">
       <input type="checkbox" id="loopToggle" onchange="toggleLoop()">
       <div class="toggle-track"></div>
-      全部輪播
+      Loop
     </label>
     <div class="speed-group">
-      <span class="speed-label-sm">速度</span>
-      <button class="speed-btn" onclick="setSpeed(0.6)" id="spd06">慢</button>
-      <button class="speed-btn active" onclick="setSpeed(0.85)" id="spd085">中</button>
-      <button class="speed-btn" onclick="setSpeed(1.0)" id="spd10">正常</button>
+      <span class="speed-label-sm">Speed</span>
+      <button class="speed-btn" onclick="setSpeed(0.6)" id="spd06">Slow</button>
+      <button class="speed-btn active" onclick="setSpeed(0.85)" id="spd085">Mid</button>
+      <button class="speed-btn" onclick="setSpeed(1.0)" id="spd10">Fast</button>
     </div>
   </div>
   <div class="nav-row">
-    <button class="btn-nav" onclick="prevCard()" title="上一張">◀</button>
+    <button class="btn-nav" onclick="prevCard()">◀</button>
     <button class="btn-play-main" id="btnPlayMain" onclick="playCard()">
       <span id="btnPlayIcon">▶</span>
       <span id="btnPlayText">朗讀 × 3</span>
     </button>
-    <button class="btn-nav" onclick="nextCard()" title="下一張">▶</button>
+    <button class="btn-nav" onclick="nextCard()">▶</button>
   </div>
 </div>
 
 <script>
-// ===== 新版中日交流標準日本語 初級上 DATABASE =====
-// format: word, reading, type, meaning, sentence (with ruby markup), sentenceReading, sentenceMeaning
 const CARDS = [
-  {
-    word: '先生', ruby: '先生|せんせい', reading: 'せんせい',
-    type: '名詞', meaning: '老師',
-    sentence: '森|もり さんは 先生|せんせい ですか。',
-    sentenceMeaning: '森先生是老師嗎？'
-  },
-  {
-    word: '学生', ruby: '学生|がくせい', reading: 'がくせい',
-    type: '名詞', meaning: '（大）學生',
-    sentence: '李|り さんは 学生|がくせい では ありません。',
-    sentenceMeaning: '小李不是學生。'
-  },
-  {
-    word: '会社員', ruby: '会社員|かいしゃいん', reading: 'かいしゃいん',
-    type: '名詞', meaning: '公司職員',
-    sentence: '李|り さんは 会社員|かいしゃいん です。',
-    sentenceMeaning: '小李是公司職員。'
-  },
-  {
-    word: '教授', ruby: '教授|きょうじゅ', reading: 'きょうじゅ',
-    type: '名詞', meaning: '教授',
-    sentence: 'デュポンさんは 東京大学|とうきょうだいがく の 教授|きょうじゅ です。',
-    sentenceMeaning: '杜邦先生是東京大學的教授。'
-  },
-  {
-    word: '課長', ruby: '課長|かちょう', reading: 'かちょう',
-    type: '名詞', meaning: '科長',
-    sentence: '吉田|よしだ さんは 課長|かちょう です。',
-    sentenceMeaning: '吉田先生是科長。'
-  },
-  {
-    word: '社長', ruby: '社長|しゃちょう', reading: 'しゃちょう',
-    type: '名詞', meaning: '總經理；社長',
-    sentence: '中村|なかむら さんは 社長|しゃちょう です。',
-    sentenceMeaning: '中村先生是總經理。'
-  },
-  {
-    word: '本', ruby: '本|ほん', reading: 'ほん',
-    type: '名詞', meaning: '書',
-    sentence: 'これは 日本語|にほんご の 本|ほん です。',
-    sentenceMeaning: '這是日語書。'
-  },
-  {
-    word: '辞書', ruby: '辞書|じしょ', reading: 'じしょ',
-    type: '名詞', meaning: '詞典',
-    sentence: 'それは 李|り さんの 辞書|じしょ です。',
-    sentenceMeaning: '那是小李的詞典。'
-  },
-  {
-    word: 'かばん', ruby: 'かばん', reading: 'かばん',
-    type: '名詞', meaning: '包；公文包',
-    sentence: '森|もり さんの かばんは どれ ですか。',
-    sentenceMeaning: '森先生的包是哪個？'
-  },
-  {
-    word: '傘', ruby: '傘|かさ', reading: 'かさ',
-    type: '名詞', meaning: '傘',
-    sentence: 'この 傘|かさ は 森|もり さんのです。',
-    sentenceMeaning: '這把傘是森先生的。'
-  },
-  {
-    word: '電話', ruby: '電話|でんわ', reading: 'でんわ',
-    type: '名詞', meaning: '電話',
-    sentence: 'わたしの 部屋|へや には 電話|でんわ が ありません。',
-    sentenceMeaning: '我的房間沒有電話。'
-  },
-  {
-    word: '時計', ruby: '時計|とけい', reading: 'とけい',
-    type: '名詞', meaning: '鐘；錶',
-    sentence: '箱|はこ の 中|なか に 時計|とけい と 眼鏡|めがね が あります。',
-    sentenceMeaning: '盒子裡有手錶和眼鏡。'
-  },
-  {
-    word: '車', ruby: '車|くるま', reading: 'くるま',
-    type: '名詞', meaning: '車',
-    sentence: '田中|たなか さんの 車|くるま は どれ ですか。',
-    sentenceMeaning: '田中先生的車是哪輛？'
-  },
-  {
-    word: '自転車', ruby: '自転車|じてんしゃ', reading: 'じてんしゃ',
-    type: '名詞', meaning: '自行車',
-    sentence: '駅|えき から アパートまで 自転車|じてんしゃ で 行|い きます。',
-    sentenceMeaning: '從車站騎自行車去公寓。'
-  },
-  {
-    word: 'デパート', ruby: 'デパート', reading: 'デパート',
-    type: '名詞', meaning: '百貨商店',
-    sentence: '食堂|しょくどう は デパート の 7階|ななかい です。',
-    sentenceMeaning: '食堂在百貨商店的7樓。'
-  },
-  {
-    word: '食堂', ruby: '食堂|しょくどう', reading: 'しょくどう',
-    type: '名詞', meaning: '食堂',
-    sentence: '食堂|しょくどう は デパート の 7階|ななかい です。',
-    sentenceMeaning: '食堂在百貨商店的7樓。'
-  },
-  {
-    word: '銀行', ruby: '銀行|ぎんこう', reading: 'ぎんこう',
-    type: '名詞', meaning: '銀行',
-    sentence: '郵便局|ゆうびんきょく は どこ ですか。',
-    sentenceMeaning: '郵局在哪裡？'
-  },
-  {
-    word: '郵便局', ruby: '郵便局|ゆうびんきょく', reading: 'ゆうびんきょく',
-    type: '名詞', meaning: '郵局',
-    sentence: '郵便局|ゆうびんきょく は どこ ですか。',
-    sentenceMeaning: '郵局在哪裡？'
-  },
-  {
-    word: '病院', ruby: '病院|びょういん', reading: 'びょういん',
-    type: '名詞', meaning: '醫院',
-    sentence: '病院|びょういん の 前|まえ に います。',
-    sentenceMeaning: '在醫院前面。'
-  },
-  {
-    word: '駅', ruby: '駅|えき', reading: 'えき',
-    type: '名詞', meaning: '車站',
-    sentence: '李|り さんは 駅|えき から アパートまで 歩|ある いて 帰|かえ りました。',
-    sentenceMeaning: '小李從車站步行回到公寓。'
-  },
-  {
-    word: '部屋', ruby: '部屋|へや', reading: 'へや',
-    type: '名詞', meaning: '房間；屋子',
-    sentence: '部屋|へや に 机|つくえ と いすが あります。',
-    sentenceMeaning: '房間裡有桌子和椅子。'
-  },
-  {
-    word: '机', ruby: '机|つくえ', reading: 'つくえ',
-    type: '名詞', meaning: '桌子；書桌',
-    sentence: '机|つくえ の 上|うえ に 辞書|じしょ が あります。',
-    sentenceMeaning: '桌子上有詞典。'
-  },
-  {
-    word: '眼鏡', ruby: '眼鏡|めがね', reading: 'めがね',
-    type: '名詞', meaning: '眼鏡',
-    sentence: '箱|はこ の 中|なか に 眼鏡|めがね が あります。',
-    sentenceMeaning: '盒子裡有眼鏡。'
-  },
-  {
-    word: '猫', ruby: '猫|ねこ', reading: 'ねこ',
-    type: '名詞', meaning: '貓',
-    sentence: '部屋|へや に 猫|ねこ が います。',
-    sentenceMeaning: '房間裡有一隻貓。'
-  },
-  {
-    word: '犬', ruby: '犬|いぬ', reading: 'いぬ',
-    type: '名詞', meaning: '狗',
-    sentence: 'あそこに 犬|いぬ が います ね。',
-    sentenceMeaning: '那裡有一條狗呢。'
-  },
-  {
-    word: '子供', ruby: '子供|こども', reading: 'こども',
-    type: '名詞', meaning: '孩子；小孩',
-    sentence: '公園|こうえん に 子供|こども が います。',
-    sentenceMeaning: '公園裡有孩子。'
-  },
-  {
-    word: '今', ruby: '今|いま', reading: 'いま',
-    type: '名詞', meaning: '現在',
-    sentence: '今|いま 何時|なんじ ですか。',
-    sentenceMeaning: '現在幾點了？'
-  },
-  {
-    word: '昨日', ruby: '昨日|きのう', reading: 'きのう',
-    type: '名詞', meaning: '昨天',
-    sentence: '昨日|きのう は 日曜日|にちようび でした。',
-    sentenceMeaning: '昨天是星期日。'
-  },
-  {
-    word: '明日', ruby: '明日|あした', reading: 'あした',
-    type: '名詞', meaning: '明天',
-    sentence: '明日|あした 長島|ながしま さんに 会|あ います。',
-    sentenceMeaning: '明天和長島先生見面。'
-  },
-  {
-    word: '毎日', ruby: '毎日|まいにち', reading: 'まいにち',
-    type: '名詞', meaning: '每天',
-    sentence: '森|もり さんは 毎日|まいにち 7時|しちじ に 起|お きます。',
-    sentenceMeaning: '森先生每天7點起床。'
-  },
-  {
-    word: '仕事', ruby: '仕事|しごと', reading: 'しごと',
-    type: '名詞', meaning: '工作',
-    sentence: '仕事|しごと は 何時|なんじ に 終|お わりますか。',
-    sentenceMeaning: '工作幾點結束？'
-  },
-  {
-    word: '休み', ruby: '休|やす み', reading: 'やすみ',
-    type: '名詞', meaning: '休息',
-    sentence: '土曜日|どようび と 日曜日|にちようび は 休|やす み です。',
-    sentenceMeaning: '週六和週日是休息日。'
-  },
-  {
-    word: '来月', ruby: '来月|らいげつ', reading: 'らいげつ',
-    type: '名詞', meaning: '下個月',
-    sentence: '吉田|よしだ さんは 来月|らいげつ 中国|ちゅうごく へ 行|い きます。',
-    sentenceMeaning: '吉田先生下個月去中國。'
-  },
-  {
-    word: '先月', ruby: '先月|せんげつ', reading: 'せんげつ',
-    type: '名詞', meaning: '上個月',
-    sentence: '李|り さんは 先月|せんげつ 北京|ペキン から 来|き ました。',
-    sentenceMeaning: '小李上個月從北京來的。'
-  },
-  {
-    word: '友達', ruby: '友達|ともだち', reading: 'ともだち',
-    type: '名詞', meaning: '朋友',
-    sentence: '小野|おの さんは 友達|ともだち と 帰|かえ りました。',
-    sentenceMeaning: '小野女士和朋友一起回去了。'
-  },
-  {
-    word: '飛行機', ruby: '飛行機|ひこうき', reading: 'ひこうき',
-    type: '名詞', meaning: '飛機',
-    sentence: '大阪|おおさか から 上海まで 飛行機|ひこうき で 行|い きます。',
-    sentenceMeaning: '從大阪坐飛機去上海。'
-  },
-  {
-    word: '新幹線', ruby: '新幹線|しんかんせん', reading: 'しんかんせん',
-    type: '名詞', meaning: '新幹線',
-    sentence: '東京|とうきょう から 広島|ひろしま まで 新幹線|しんかんせん で 行|い きます。',
-    sentenceMeaning: '從東京坐新幹線去廣島。'
-  },
-  {
-    word: '電車', ruby: '電車|でんしゃ', reading: 'でんしゃ',
-    type: '名詞', meaning: '電車',
-    sentence: '渋谷|しぶや まで 電車|でんしゃ で 行|い きました。',
-    sentenceMeaning: '坐電車去澀谷了。'
-  },
-  {
-    word: 'コーヒー', ruby: 'コーヒー', reading: 'コーヒー',
-    type: '名詞', meaning: '咖啡',
-    sentence: '李|り さんは 毎日|まいにち コーヒー を 飲|の みます。',
-    sentenceMeaning: '小李每天喝咖啡。'
-  },
-  {
-    word: 'パン', ruby: 'パン', reading: 'パン',
-    type: '名詞', meaning: '麵包',
-    sentence: 'わたしは 毎朝|まいあさ パン を 食|た べます。',
-    sentenceMeaning: '我每天早上吃麵包。'
-  },
-  {
-    word: '手紙', ruby: '手紙|てがみ', reading: 'てがみ',
-    type: '名詞', meaning: '信',
-    sentence: '李|り さんは 日本語|にほんご で 手紙|てがみ を 書|か きます。',
-    sentenceMeaning: '小李用日語寫信。'
-  },
-  {
-    word: '花', ruby: '花|はな', reading: 'はな',
-    type: '名詞', meaning: '花',
-    sentence: '小野|おの さんに 花|はな を あげます。',
-    sentenceMeaning: '給小野女士花。'
-  },
-  {
-    word: 'お金', ruby: 'お 金|かね', reading: 'おかね',
-    type: '名詞', meaning: '錢；金錢',
-    sentence: 'お 金|かね が ありません。',
-    sentenceMeaning: '沒有錢。'
-  },
-  {
-    word: '天気', ruby: '天気|てんき', reading: 'てんき',
-    type: '名詞', meaning: '天氣',
-    sentence: '東京|とうきょう の 天気|てんき は どうでしたか。',
-    sentenceMeaning: '東京的天氣怎麼樣？'
-  },
-  {
-    word: '山', ruby: '山|やま', reading: 'やま',
-    type: '名詞', meaning: '山',
-    sentence: '富士山|ふじさん は 日本|にほん で いちばん 高|たか い 山|やま です。',
-    sentenceMeaning: '富士山是日本最高的山。'
-  },
-  {
-    word: '海', ruby: '海|うみ', reading: 'うみ',
-    type: '名詞', meaning: '大海',
-    sentence: '海|うみ が 青|あお いです。',
-    sentenceMeaning: '大海是藍色的。'
-  },
-  {
-    word: '料理', ruby: '料理|りょうり', reading: 'りょうり',
-    type: '名詞', meaning: '菜餚；飯菜',
-    sentence: '吉田|よしだ さんは 料理|りょうり が できますか。',
-    sentenceMeaning: '吉田先生會做菜嗎？'
-  },
-  {
-    word: '映画', ruby: '映画|えいが', reading: 'えいが',
-    type: '名詞', meaning: '電影',
-    sentence: '映画|えいが の チケット を だれに あげますか。',
-    sentenceMeaning: '電影票給誰？'
-  },
-  {
-    word: '音楽', ruby: '音楽|おんがく', reading: 'おんがく',
-    type: '名詞', meaning: '音樂',
-    sentence: 'どんな 音楽|おんがく が 好|す きですか。',
-    sentenceMeaning: '喜歡什麼樣的音樂？'
-  },
-  {
-    word: '歌', ruby: '歌|うた', reading: 'うた',
-    type: '名詞', meaning: '歌；歌曲',
-    sentence: '小野|おの さんは 歌|うた が 好|す きです。',
-    sentenceMeaning: '小野女士喜歡唱歌。'
-  },
-  {
-    word: '起きます', ruby: '起|お きます', reading: 'おきます',
-    type: '動詞（二類）', meaning: '起床',
-    sentence: '森|もり さんは 毎朝|まいあさ 7時|しちじ に 起|お きます。',
-    sentenceMeaning: '森先生每天早晨7點起床。'
-  },
-  {
-    word: '寝ます', ruby: '寝|ね ます', reading: 'ねます',
-    type: '動詞（二類）', meaning: '睡覺',
-    sentence: '昨日|きのう 12時半|じゅうにじはん ごろ 寝|ね ました。',
-    sentenceMeaning: '昨晚12點半左右睡覺了。'
-  },
-  {
-    word: '働きます', ruby: '働|はたら きます', reading: 'はたらきます',
-    type: '動詞（一類）', meaning: '工作',
-    sentence: '午前|ごぜん 8時|はちじ から 午後|ごご 5時|ごじ まで 働|はたら きます。',
-    sentenceMeaning: '從上午8點工作到下午5點。'
-  },
-  {
-    word: '行きます', ruby: '行|い きます', reading: 'いきます',
-    type: '動詞（一類）', meaning: '去',
-    sentence: '吉田|よしだ さんは 来月|らいげつ 中国|ちゅうごく へ 行|い きます。',
-    sentenceMeaning: '吉田先生下個月去中國。'
-  },
-  {
-    word: '来ます', ruby: '来|き ます', reading: 'きます',
-    type: '動詞（三類）', meaning: '來',
-    sentence: '李|り さんは 先月|せんげつ 北京|ペキン から 来|き ました。',
-    sentenceMeaning: '小李上個月從北京來的。'
-  },
-  {
-    word: '帰ります', ruby: '帰|かえ ります', reading: 'かえります',
-    type: '動詞（一類）', meaning: '回來；回去',
-    sentence: '今日|きょう は まっすぐ 帰|かえ ります。',
-    sentenceMeaning: '今天直接回家。'
-  },
-  {
-    word: '飲みます', ruby: '飲|の みます', reading: 'のみます',
-    type: '動詞（一類）', meaning: '喝',
-    sentence: '李|り さんは 毎日|まいにち コーヒー を 飲|の みます。',
-    sentenceMeaning: '小李每天喝咖啡。'
-  },
-  {
-    word: '食べます', ruby: '食|た べます', reading: 'たべます',
-    type: '動詞（二類）', meaning: '吃',
-    sentence: 'わたしは 毎朝|まいあさ パン を 食|た べます。',
-    sentenceMeaning: '我每天早上吃麵包。'
-  },
-  {
-    word: '見ます', ruby: '見|み ます', reading: 'みます',
-    type: '動詞（二類）', meaning: '看',
-    sentence: '東大寺|とうだいじ で 大仏|だいぶつ を 見|み ました。',
-    sentenceMeaning: '在東大寺看了大佛。'
-  },
-  {
-    word: '読みます', ruby: '読|よ みます', reading: 'よみます',
-    type: '動詞（一類）', meaning: '讀',
-    sentence: '今朝|けさ うちで 新聞|しんぶん を 読|よ みましたか。',
-    sentenceMeaning: '今天早上在家看報紙了嗎？'
-  },
-  {
-    word: '書きます', ruby: '書|か きます', reading: 'かきます',
-    type: '動詞（一類）', meaning: '寫',
-    sentence: '李|り さんは 日本語|にほんご で 手紙|てがみ を 書|か きます。',
-    sentenceMeaning: '小李用日語寫信。'
-  },
-  {
-    word: '聞きます', ruby: '聞|き きます', reading: 'ききます',
-    type: '動詞（一類）', meaning: '聽',
-    sentence: '家|いえ で CD を よく 聞|き きます。',
-    sentenceMeaning: '在家經常聽CD。'
-  },
-  {
-    word: '買います', ruby: '買|か います', reading: 'かいます',
-    type: '動詞（一類）', meaning: '買',
-    sentence: 'きれいな 人形|にんぎょう を 買|か いました。',
-    sentenceMeaning: '買了漂亮的玩偶。'
-  },
-  {
-    word: 'あります', ruby: 'あります', reading: 'あります',
-    type: '動詞（一類）', meaning: '有；在（物）',
-    sentence: '部屋|へや に 机|つくえ と いすが あります。',
-    sentenceMeaning: '房間裡有桌子和椅子。'
-  },
-  {
-    word: 'います', ruby: 'います', reading: 'います',
-    type: '動詞（二類）', meaning: '有；在（人・動物）',
-    sentence: '吉田|よしだ さんは 庭|にわ に います。',
-    sentenceMeaning: '吉田先生在院子裡。'
-  },
-  {
-    word: '分かります', ruby: '分|わ かります', reading: 'わかります',
-    type: '動詞（一類）', meaning: '懂；明白',
-    sentence: 'スミスさんは 韓国語|かんこくご が 分|わ かります。',
-    sentenceMeaning: '史密斯先生懂韓語。'
-  },
-  {
-    word: 'できます', ruby: 'できます', reading: 'できます',
-    type: '動詞（二類）', meaning: '會；能；完成',
-    sentence: '吉田|よしだ さんは 料理|りょうり が できますか。',
-    sentenceMeaning: '吉田先生會做菜嗎？'
-  },
-  {
-    word: '勉強します', ruby: '勉強|べんきょう します', reading: 'べんきょうします',
-    type: '動詞（三類）', meaning: '學習',
-    sentence: '李|り さんは 図書館|としょかん で 勉強|べんきょう します。',
-    sentenceMeaning: '小李在圖書館學習。'
-  },
-  {
-    word: '大きい', ruby: '大|おお きい', reading: 'おおきい',
-    type: 'い形容詞', meaning: '大',
-    sentence: '横浜|よこはま は 大|おお きい 町|まち です。',
-    sentenceMeaning: '橫濱是一座大城市。'
-  },
-  {
-    word: '小さい', ruby: '小|ちい さい', reading: 'ちいさい',
-    type: 'い形容詞', meaning: '小',
-    sentence: 'この 部屋|へや は 小|ちい さいです。',
-    sentenceMeaning: '這個房間很小。'
-  },
-  {
-    word: '高い', ruby: '高|たか い', reading: 'たかい',
-    type: 'い形容詞', meaning: '高；貴',
-    sentence: 'この カメラは 高|たか いです。',
-    sentenceMeaning: '這台相機很貴。'
-  },
-  {
-    word: '安い', ruby: '安|やす い', reading: 'やすい',
-    type: 'い形容詞', meaning: '便宜',
-    sentence: 'このお 店|みせ の 料理|りょうり は 安|やす いです。',
-    sentenceMeaning: '這家店的飯菜很便宜。'
-  },
-  {
-    word: 'おいしい', ruby: 'おいしい', reading: 'おいしい',
-    type: 'い形容詞', meaning: '好吃；可口',
-    sentence: '北京ダック は おいしいです。',
-    sentenceMeaning: '北京烤鴨很好吃。'
-  },
-  {
-    word: '忙しい', ruby: '忙|いそが しい', reading: 'いそがしい',
-    type: 'い形容詞', meaning: '忙；忙碌',
-    sentence: '毎日|まいにち 忙|いそが しいです。',
-    sentenceMeaning: '每天都很忙。'
-  },
-  {
-    word: '難しい', ruby: '難|むずか しい', reading: 'むずかしい',
-    type: 'い形容詞', meaning: '難',
-    sentence: '日本語|にほんご と 英語|えいご と どちらが 難|むずか しいですか。',
-    sentenceMeaning: '日語和英語哪個更難？'
-  },
-  {
-    word: '楽しい', ruby: '楽|たの しい', reading: 'たのしい',
-    type: 'い形容詞', meaning: '愉快；快樂',
-    sentence: '旅行|りょこう は 楽|たの しかったです。',
-    sentenceMeaning: '旅行很愉快。'
-  },
-  {
-    word: 'きれい', ruby: 'きれい', reading: 'きれい',
-    type: 'な形容詞', meaning: '漂亮；乾淨',
-    sentence: '京都|きょうと は とても きれいでした。',
-    sentenceMeaning: '京都非常漂亮。'
-  },
-  {
-    word: '有名', ruby: '有名|ゆうめい', reading: 'ゆうめい',
-    type: 'な形容詞', meaning: '有名',
-    sentence: '京都|きょうと の 紅葉|もみじ は 有名|ゆうめい です。',
-    sentenceMeaning: '京都的紅葉很有名。'
-  },
-  {
-    word: '静か', ruby: '静|しず か', reading: 'しずか',
-    type: 'な形容詞', meaning: '安靜',
-    sentence: '奈良|なら は 京都|きょうと より 静|しず かでした。',
-    sentenceMeaning: '奈良比京都安靜。'
-  },
-  {
-    word: 'にぎやか', ruby: 'にぎやか', reading: 'にぎやか',
-    type: 'な形容詞', meaning: '熱鬧；繁華',
-    sentence: 'この 町|まち は にぎやかです。',
-    sentenceMeaning: '這個城市很熱鬧。'
-  },
-  {
-    word: '好き', ruby: '好|す き', reading: 'すき',
-    type: 'な形容詞', meaning: '喜歡',
-    sentence: '小野|おの さんは 歌|うた が 好|す きです。',
-    sentenceMeaning: '小野女士喜歡唱歌。'
-  },
-  {
-    word: '元気', ruby: '元気|げんき', reading: 'げんき',
-    type: 'な形容詞', meaning: '健康；有精神',
-    sentence: 'お 元気|げんき ですか。',
-    sentenceMeaning: '您好嗎？'
-  },
-  {
-    word: '便利', ruby: '便利|べんり', reading: 'べんり',
-    type: 'な形容詞', meaning: '方便',
-    sentence: 'この アパートは 便利|べんり です。',
-    sentenceMeaning: '這個公寓很方便。'
-  },
-  {
-    word: '上手', ruby: '上手|じょうず', reading: 'じょうず',
-    type: 'な形容詞', meaning: '擅長；高明',
-    sentence: '森|もり さんは テニスが 上手|じょうず ですね。',
-    sentenceMeaning: '森先生網球打得很好呢。'
-  },
+  { lesson:10, word:'明るい', ruby:'明|あか るい', reading:'あかるい', type:'い形容詞', meaning:'開朗的、明亮的', sentence:'明|あか るい 人|ひと が 好|す きです。', sentenceMeaning:'我喜歡開朗的人。' },
+  { lesson:14, word:'集める', ruby:'集|あつ める', reading:'あつめる', type:'動詞（他）', meaning:'收集、蒐集', sentence:'切手|きって を 集|あつ めるのが 趣味|しゅみ です。', sentenceMeaning:'集郵是我的興趣。' },
+  { lesson:12, word:'安全', ruby:'安全|あんぜん', reading:'あんぜん', type:'名詞・な形容詞', meaning:'安全', sentence:'この 道|みち は 夜|よる でも 安全|あんぜん です。', sentenceMeaning:'這條路晚上也很安全。' },
+  { lesson:18, word:'以外', ruby:'以外|いがい', reading:'いがい', type:'名詞', meaning:'以外、除了…之外', sentence:'日曜日|にちようび 以外|いがい は 毎日|まいにち 働|はたら きます。', sentenceMeaning:'除了星期天以外每天都工作。' },
+  { lesson:15, word:'急ぐ', ruby:'急|いそ ぐ', reading:'いそぐ', type:'動詞（自）', meaning:'趕快、急忙', sentence:'電車|でんしゃ に 遅|おく れそうなので 急|いそ いでください。', sentenceMeaning:'快要趕不上電車了，請快點。' },
+  { lesson:10, word:'運動', ruby:'運動|うんどう', reading:'うんどう', type:'名詞・動詞', meaning:'運動', sentence:'毎朝|まいあさ 30 分|ふん 運動|うんどう しています。', sentenceMeaning:'每天早上運動30分鐘。' },
+  { lesson:19, word:'遠慮', ruby:'遠慮|えんりょ', reading:'えんりょ', type:'名詞・動詞', meaning:'客氣、顧慮', sentence:'遠慮|えんりょ しないで、もっと 食|た べてください。', sentenceMeaning:'別客氣，請多吃一點。' },
+  { lesson:16, word:'起こす', ruby:'起|お こす', reading:'おこす', type:'動詞（他）', meaning:'叫醒、引起', sentence:'明日|あした 7 時|じ に 起|お こしてください。', sentenceMeaning:'明天請在7點叫醒我。' },
+  { lesson:14, word:'送る', ruby:'送|おく る', reading:'おくる', type:'動詞（他）', meaning:'寄送、送行', sentence:'荷物|にもつ を 海外|かいがい に 送|おく りました。', sentenceMeaning:'把行李寄到了國外。' },
+  { lesson:15, word:'落とす', ruby:'落|お とす', reading:'おとす', type:'動詞（他）', meaning:'掉落、遺失', sentence:'財布|さいふ を 落|お としてしまいました。', sentenceMeaning:'不小心把錢包掉了。' },
+  { lesson:21, word:'思い出す', ruby:'思|おも い 出|だ す', reading:'おもいだす', type:'動詞（他）', meaning:'想起、回想', sentence:'この 歌|うた を 聞|き くと 子供|こども のころを 思|おも い 出|だ します。', sentenceMeaning:'聽到這首歌就會想起小時候。' },
+  { lesson:18, word:'変える', ruby:'変|か える', reading:'かえる', type:'動詞（他）', meaning:'改變', sentence:'計画|けいかく を 変|か えることにしました。', sentenceMeaning:'決定改變計劃了。' },
+  { lesson:20, word:'確認', ruby:'確認|かくにん', reading:'かくにん', type:'名詞・動詞', meaning:'確認', sentence:'予約|よやく の 時間|じかん を 確認|かくにん してください。', sentenceMeaning:'請確認預約的時間。' },
+  { lesson:23, word:'気をつける', ruby:'気|き をつける', reading:'きをつける', type:'動詞', meaning:'小心、注意', sentence:'道|みち を 渡|わた るとき 気|き をつけてください。', sentenceMeaning:'過馬路的時候請小心。' },
+  { lesson:21, word:'経験', ruby:'経験|けいけん', reading:'けいけん', type:'名詞・動詞', meaning:'經驗、體驗', sentence:'海外|かいがい で 働|はたら いた 経験|けいけん があります。', sentenceMeaning:'有在海外工作的經驗。' },
+  { lesson:17, word:'混む', ruby:'混|こ む', reading:'こむ', type:'動詞（自）', meaning:'擁擠', sentence:'朝|あさ の 電車|でんしゃ はいつも 混|こ んでいます。', sentenceMeaning:'早上的電車總是很擁擠。' },
+  { lesson:10, word:'残念', ruby:'残念|ざんねん', reading:'ざんねん', type:'な形容詞', meaning:'可惜、遺憾', sentence:'試合|しあい に 負|ま けて 残念|ざんねん です。', sentenceMeaning:'比賽輸了，很遺憾。' },
+  { lesson:15, word:'準備', ruby:'準備|じゅんび', reading:'じゅんび', type:'名詞・動詞', meaning:'準備', sentence:'旅行|りょこう の 準備|じゅんび はもうできましたか。', sentenceMeaning:'旅行的準備好了嗎？' },
+  { lesson:22, word:'連絡', ruby:'連絡|れんらく', reading:'れんらく', type:'名詞・動詞', meaning:'聯絡、通知', sentence:'何|なに かあったらすぐ 連絡|れんらく してください。', sentenceMeaning:'有什麼事請立刻聯絡我。' },
+  { lesson:24, word:'丁寧', ruby:'丁寧|ていねい', reading:'ていねい', type:'な形容詞', meaning:'有禮貌的、仔細的', sentence:'あの 店員|てんいん はとても 丁寧|ていねい に 説明|せつめい してくれました。', sentenceMeaning:'那位店員非常有禮貌地為我說明了。' },
 ];
 
-// ===== STATE =====
-let current = 0;
-let speed = 0.85;
-let isLooping = false;
-let isPlaying = false;
-let loopTimer = null;
-let ttsVoice = null;
+const ALL_LESSONS = [...new Set(CARDS.map(c => c.lesson))].sort((a,b) => a-b);
+let filteredCards = [...CARDS];
+let current = 0, speed = 0.85;
+let isLooping = false, isPlaying = false;
+let loopTimer = null, ktvTimer = null, ttsVoice = null;
 
-// ===== TTS INIT =====
+function buildFilter() {
+  const el = document.getElementById('lessonFilter');
+  ALL_LESSONS.forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'lbtn'; b.id = 'btnL' + l;
+    b.textContent = '第' + l + '課';
+    b.onclick = () => filterLesson(l);
+    el.appendChild(b);
+  });
+}
+
+function filterLesson(l) {
+  document.querySelectorAll('.lbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById(l === 0 ? 'btnAll' : 'btnL' + l).classList.add('active');
+  filteredCards = l === 0 ? [...CARDS] : CARDS.filter(c => c.lesson === l);
+  current = 0; renderCard();
+}
+
 function initTTS() {
   if (!('speechSynthesis' in window)) return;
   const load = () => {
     const voices = speechSynthesis.getVoices();
     const ja = voices.filter(v => v.lang.startsWith('ja'));
-    if (ja.length) ttsVoice = ja.find(v => /Kyoko|O-Ren|Female|female/.test(v.name)) || ja[0];
+    if (ja.length) ttsVoice = ja.find(v => /Kyoko|O-Ren|Female|female/i.test(v.name)) || ja[0];
   };
-  if (speechSynthesis.getVoices().length) load();
-  else speechSynthesis.onvoiceschanged = load;
+  speechSynthesis.getVoices().length ? load() : (speechSynthesis.onvoiceschanged = load);
 }
 
-// ===== RUBY RENDERER =====
-// format: "漢字|よみ 漢字2|よみ2 ..."
-function renderRuby(rubyStr) {
-  if (!rubyStr) return rubyStr;
-  return rubyStr.split(' ').map(token => {
-    if (token.includes('|')) {
-      const [base, rt] = token.split('|');
-      return `<ruby>${base}<rt>${rt}</rt></ruby>`;
-    }
-    return token;
+function renderRuby(s) {
+  return s.split(' ').map(t => {
+    if (t.includes('|')) { const [b, r] = t.split('|'); return `<ruby>${b}<rt>${r}</rt></ruby>`; }
+    return t;
   }).join('');
 }
 
-// ===== RENDER CARD =====
-function renderCard() {
-  const c = CARDS[current];
-  // Trigger re-animation
-  const card = document.getElementById('card');
-  card.style.animation = 'none';
-  card.offsetHeight; // reflow
-  card.style.animation = '';
+function renderKTV(s) {
+  return s.split(' ').map((t, i) => {
+    if (!t.trim()) return '';
+    if (t.includes('|')) {
+      const [b, r] = t.split('|');
+      return `<span class="ktv-token" data-chars="${b.length}" data-i="${i}"><ruby>${b}<rt>${r}</rt></ruby></span>`;
+    }
+    return `<span class="ktv-token" data-chars="${t.length}" data-i="${i}">${t}</span>`;
+  }).join('');
+}
 
+function renderCard() {
+  const c = filteredCards[current];
+  const el = document.getElementById('card');
+  el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+
+  document.getElementById('lessonNum').textContent = '第 ' + c.lesson + ' 課';
   document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
-  document.getElementById('wordMeta').textContent = '（' + c.type + '）';
+  document.getElementById('wordMeta').textContent = c.type;
   document.getElementById('wordMeaning').textContent = c.meaning;
-  document.getElementById('sentenceJp').innerHTML = renderRuby(c.sentence);
-  document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning;
-  document.getElementById('headerCounter').textContent = `${current + 1} / ${CARDS.length}`;
-  document.getElementById('progressFill').style.width = ((current + 1) / CARDS.length * 100) + '%';
+  document.getElementById('sentenceJp').innerHTML = c.sentence ? renderKTV(c.sentence) : '<span style="color:var(--muted)">—</span>';
+  document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning || '';
+  document.getElementById('headerCounter').textContent = (current + 1) + ' / ' + filteredCards.length;
+  document.getElementById('progressFill').style.width = ((current + 1) / filteredCards.length * 100) + '%';
   resetDots();
   document.getElementById('playStatus').style.display = 'none';
 }
 
-// ===== DOTS =====
-function resetDots() {
-  [1,2,3].forEach(i => {
-    const d = document.getElementById('dot' + i);
-    d.className = 'dot';
-  });
+function resetDots() { [1,2,3].forEach(i => document.getElementById('dot' + i).className = 'dot'); }
+function setDot(n, s) { document.getElementById('dot' + n).className = 'dot ' + s; }
+
+function startKTV() {
+  const tokens = [...document.querySelectorAll('.ktv-token')];
+  if (!tokens.length) return;
+  tokens.forEach(t => t.classList.remove('ktv-done', 'ktv-now'));
+  const msPerChar = 145 / speed;
+  let idx = 0;
+  function step() {
+    if (!isPlaying || idx >= tokens.length) return;
+    if (idx > 0) { tokens[idx-1].classList.remove('ktv-now'); tokens[idx-1].classList.add('ktv-done'); }
+    tokens[idx].classList.add('ktv-now');
+    const chars = parseInt(tokens[idx].dataset.chars) || 1;
+    idx++;
+    ktvTimer = setTimeout(step, chars * msPerChar);
+  }
+  step();
 }
 
-function setDot(n, state) {
-  // state: 'active' | 'done'
-  const d = document.getElementById('dot' + n);
-  d.className = 'dot ' + state;
+function stopKTV() {
+  clearTimeout(ktvTimer);
+  document.querySelectorAll('.ktv-token').forEach(t => t.classList.remove('ktv-done', 'ktv-now'));
 }
 
-// ===== SPEAK =====
+function rawText(s) { return s.replace(/\|[^\s|]*/g, '').replace(/\s+/g, ''); }
+
 function utter(text, onEnd) {
   if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP';
-  u.rate = speed;
-  u.pitch = 1.0;
+  u.lang = 'ja-JP'; u.rate = speed; u.pitch = 1.0;
   if (ttsVoice) u.voice = ttsVoice;
   u.onend = () => { if (onEnd) onEnd(); };
   u.onerror = () => { if (onEnd) onEnd(); };
   speechSynthesis.speak(u);
 }
 
-function speakWord() {
-  const c = CARDS[current];
-  utter(c.word);
-}
+function speakWord() { utter(filteredCards[current].word); }
 
 function speakSentence() {
-  const c = CARDS[current];
-  utter(c.sentence.replace(/\|[^\s]*/g, '').replace(/\s+/g, ''));
+  const c = filteredCards[current];
+  if (!c.sentence) return;
+  stopKTV(); startKTV();
+  utter(rawText(c.sentence));
 }
 
-// Raw Japanese text (strip ruby markup)
-function rawText(str) {
-  return str.replace(/\|[^\s|]*/g, '').replace(/\s+/g, '');
-}
-
-// ===== PLAY CARD (word + sentence × 3) =====
 function playCard() {
-  if (isPlaying) {
-    stopPlay();
-    return;
-  }
-  isPlaying = true;
-  setBtnPlaying(true);
+  if (isPlaying) { stopPlay(); return; }
+  isPlaying = true; setBtnPlaying(true);
   document.getElementById('playStatus').style.display = 'flex';
   resetDots();
-
-  const c = CARDS[current];
-  const word = c.word;
-  const sentence = rawText(c.sentence);
-
+  const c = filteredCards[current];
+  const sent = c.sentence ? rawText(c.sentence) : null;
   let rep = 0;
-
-  function playRound() {
+  function round() {
     if (!isPlaying) return;
-    rep++;
-    if (rep > 3) {
-      finishPlay();
-      return;
-    }
+    if (++rep > 3) { finishPlay(); return; }
     setDot(rep, 'active');
-    document.getElementById('playStatusText').textContent = `第 ${rep} 次`;
-
-    // speak word, then after short pause speak sentence
-    utter(word, () => {
+    document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
+    utter(c.word, () => {
       if (!isPlaying) return;
+      if (!sent) { setDot(rep, 'done'); setTimeout(() => { if (isPlaying) round(); }, 400); return; }
       setTimeout(() => {
         if (!isPlaying) return;
-        utter(sentence, () => {
+        stopKTV(); startKTV();
+        utter(sent, () => {
           if (!isPlaying) return;
           setDot(rep, 'done');
-          setTimeout(() => {
-            if (!isPlaying) return;
-            playRound();
-          }, 600);
+          setTimeout(() => { if (isPlaying) round(); }, 600);
         });
       }, 400);
     });
   }
-
-  playRound();
+  round();
 }
 
 function stopPlay() {
@@ -1028,92 +491,54 @@ function stopPlay() {
   speechSynthesis.cancel && speechSynthesis.cancel();
   setBtnPlaying(false);
   document.getElementById('playStatus').style.display = 'none';
-  resetDots();
+  stopKTV(); resetDots();
 }
 
 function finishPlay() {
-  isPlaying = false;
-  setBtnPlaying(false);
+  isPlaying = false; setBtnPlaying(false);
   document.getElementById('playStatusText').textContent = '完成 ✓';
-  setTimeout(() => {
-    document.getElementById('playStatus').style.display = 'none';
-  }, 1200);
-
+  setTimeout(() => { document.getElementById('playStatus').style.display = 'none'; }, 1200);
+  stopKTV();
   if (isLooping) {
-    // Move to next card after delay
     loopTimer = setTimeout(() => {
       if (!isLooping) return;
       nextCard();
-      setTimeout(() => {
-        if (isLooping) playCard();
-      }, 600);
+      setTimeout(() => { if (isLooping) playCard(); }, 600);
     }, 800);
   }
 }
 
-function setBtnPlaying(playing) {
-  const btn = document.getElementById('btnPlayMain');
-  const icon = document.getElementById('btnPlayIcon');
-  const text = document.getElementById('btnPlayText');
-  if (playing) {
-    btn.classList.add('playing');
-    icon.textContent = '■';
-    text.textContent = '停止';
-  } else {
-    btn.classList.remove('playing');
-    icon.textContent = '▶';
-    text.textContent = '朗讀 × 3';
-  }
+function setBtnPlaying(p) {
+  document.getElementById('btnPlayIcon').textContent = p ? '■' : '▶';
+  document.getElementById('btnPlayText').textContent = p ? 'Stop' : '朗讀 × 3';
+  document.getElementById('btnPlayMain').classList.toggle('playing', p);
 }
 
-// ===== NAV =====
-function prevCard() {
-  stopPlay();
-  clearTimeout(loopTimer);
-  current = (current - 1 + CARDS.length) % CARDS.length;
-  renderCard();
-}
+function prevCard() { stopPlay(); clearTimeout(loopTimer); current = (current - 1 + filteredCards.length) % filteredCards.length; renderCard(); }
+function nextCard() { stopPlay(); clearTimeout(loopTimer); current = (current + 1) % filteredCards.length; renderCard(); }
 
-function nextCard() {
-  stopPlay();
-  clearTimeout(loopTimer);
-  current = (current + 1) % CARDS.length;
-  renderCard();
-}
-
-// ===== LOOP =====
 function toggleLoop() {
   isLooping = document.getElementById('loopToggle').checked;
-  const label = document.getElementById('loopLabel');
-  const badge = document.getElementById('loopBadge');
-  label.classList.toggle('active', isLooping);
-  badge.classList.toggle('visible', isLooping);
-  if (!isLooping) {
-    clearTimeout(loopTimer);
-  }
+  document.getElementById('loopLabel').classList.toggle('active', isLooping);
+  document.getElementById('loopBadge').classList.toggle('visible', isLooping);
+  if (!isLooping) clearTimeout(loopTimer);
 }
 
-// ===== SPEED =====
 function setSpeed(s) {
   speed = s;
   ['spd06','spd085','spd10'].forEach(id => document.getElementById(id).classList.remove('active'));
-  const map = {0.6:'spd06', 0.85:'spd085', 1.0:'spd10'};
+  const map = { 0.6:'spd06', 0.85:'spd085', 1.0:'spd10' };
   if (map[s]) document.getElementById(map[s]).classList.add('active');
 }
 
-// ===== SWIPE (mobile) =====
-let touchStartX = 0;
-document.getElementById('card').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+let tx = 0;
+document.getElementById('card').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
 document.getElementById('card').addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 60) {
-    if (dx < 0) nextCard(); else prevCard();
-  }
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 60) { dx < 0 ? nextCard() : prevCard(); }
 }, {passive:true});
 
-// ===== INIT =====
-initTTS();
-renderCard();
+initTTS(); buildFilter(); renderCard();
 </script>
 </body>
 </html>
