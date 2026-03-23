@@ -94,14 +94,13 @@
   }
   .word-main:hover { opacity: 0.8; }
 
-  .word-main ruby { display: inline-flex; flex-direction: column-reverse; align-items: center; }
+  .word-main ruby { display: ruby; }
   .word-main ruby rt {
-    font-size: 0.3em;
+    display: ruby-text;
+    font-size: 0.35em;
     font-weight: 400;
     color: var(--ruby);
     letter-spacing: 0.06em;
-    line-height: 1;
-    margin-bottom: 3px;
   }
 
   .word-meta {
@@ -143,13 +142,13 @@
   }
   .sentence-jp:hover { opacity: 0.75; }
 
-  .sentence-jp ruby { display: inline-flex; flex-direction: column-reverse; align-items: center; margin: 0 0.5px; }
+  .sentence-jp ruby { display: ruby; margin: 0 0.5px; }
   .sentence-jp ruby rt {
+    display: ruby-text;
     font-size: 0.48em;
     font-weight: 300;
     color: var(--ruby);
     letter-spacing: 0.04em;
-    line-height: 1;
   }
 
   .sentence-meaning {
