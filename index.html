@@ -200,6 +200,18 @@
   .btn-sent:hover:not(:disabled) { background: var(--shu-bg); }
   .btn-sent.playing { background: var(--kon); color: white; border-color: transparent; }
   .btn-sent:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* 例句測試模式 */
+  .sent-jp-wrap { position: relative; }
+  .sent-jp-cover {
+    position: absolute; inset: -6px -8px; background: var(--bg); border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--ring-sm);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s; cursor: pointer;
+  }
+  .sent-jp-cover span { font-family: "Courier New", monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .sent-jp-wrap.hidden .sent-jp-cover { opacity: 1; pointer-events: auto; }
+  .sent-jp-wrap:not(.hidden) .sent-jp-cover { opacity: 0; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -246,7 +258,10 @@
     <div class="divider"></div>
 
     <div class="sentence-label">例句</div>
-    <div class="sentence-jp" id="sentenceJp" onclick="speakSentence()"></div>
+    <div class="sent-jp-wrap" id="sentJpWrap" onclick="revealSentJp()">
+      <div class="sentence-jp" id="sentenceJp" onclick="speakSentence()"></div>
+      <div class="sent-jp-cover"><span>點擊顯示例句</span></div>
+    </div>
     <div class="sentence-empty" id="sentenceEmpty" style="display:none">— 例句未設定 —</div>
 
     <div class="sent-cn-wrap" id="sentMeaningWrap" onclick="revealSentMeaning()">
@@ -277,6 +292,11 @@
         <input type="checkbox" id="cnToggle">
         <div class="toggle-track"></div>
         中日
+      </label>
+      <label class="tog-label" id="testLabel">
+        <input type="checkbox" id="testToggle" onchange="toggleTestMode()">
+        <div class="toggle-track"></div>
+        測試
       </label>
     </div>
     <div class="speed-group">
@@ -783,6 +803,7 @@ function renderCard() {
   el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
 
   document.getElementById('meaningWrap').classList.remove('revealed');
+  if (testMode) { document.getElementById('sentJpWrap').classList.add('hidden'); }
   document.getElementById('sentMeaningWrap').classList.remove('revealed');
 
   document.getElementById('lessonNum').textContent = '第 ' + c.lesson + ' 課';
@@ -970,6 +991,21 @@ document.getElementById('card').addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - tx;
   if (Math.abs(dx) > 60) { dx < 0 ? nextCard() : prevCard(); }
 }, {passive:true});
+
+
+// ── Test Mode ──
+let testMode = false;
+function toggleTestMode() {
+  testMode = document.getElementById('testToggle').checked;
+  document.getElementById('testLabel').classList.toggle('active', testMode);
+  const wrap = document.getElementById('sentJpWrap');
+  if (testMode) { wrap.classList.add('hidden'); }
+  else { wrap.classList.remove('hidden'); }
+}
+function revealSentJp() {
+  if (!testMode) return;
+  document.getElementById('sentJpWrap').classList.remove('hidden');
+}
 
 initTTS(); buildFilter(); renderCard();
 </script>
