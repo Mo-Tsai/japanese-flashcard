@@ -8,19 +8,20 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
   :root {
-    --bg:       #F6EDE1;
-    --bg2:      #EDE3D4;
-    --card:     #FDFAF5;
+    --bg:       #E8E2D2;
+    --bg2:      #DDD7C6;
+    --card:     #F5F0E6;
     --ink:      #1E1611;
-    --ink-mid:  #3C2E24;
-    --muted:    #8A7B6E;
-    --ring:     rgba(30,22,17,0.08);
-    --ring-sm:  rgba(30,22,17,0.05);
-    --shu:      #B5380F;
-    --shu-bg:   #F5E2DA;
-    --kon:      #1E3A6E;
-    --yama:     #C48C0A;
-    --ruby:     #9A3818;
+    --ink-mid:  #3D3028;
+    --muted:    #7A6E62;
+    --ring:     rgba(30,22,17,0.07);
+    --ring-sm:  rgba(30,22,17,0.04);
+    --shu:      #9B400E;
+    --shu-bg:   #EDD8CA;
+    --kon:      #253C5E;
+    --yama:     #A07820;
+    --ruby:     #3D5A7A;
+    --dict-col: #9B400E;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,217 +32,174 @@
     background: var(--bg2);
     color: var(--ink);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; flex-direction: column; align-items: center;
   }
 
-  /* HEADER */
   .header {
-    width: 100%; max-width: 480px;
-    background: var(--card);
-    padding: 13px 20px;
-    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; max-width: 480px; background: var(--card);
+    padding: 13px 20px; display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 50;
     box-shadow: 0 0 0 1px var(--ring), 0 2px 12px rgba(30,22,17,0.06);
   }
   .header-left { display: flex; align-items: baseline; gap: 8px; }
   .header-title { font-size: 0.92rem; font-weight: 600; letter-spacing: -0.01em; }
   .header-sub { font-size: 0.78rem; color: var(--muted); font-weight: 400; }
-  .header-counter {
-    font-family: 'Courier New', monospace;
-    font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em;
-  }
+  .header-counter { font-family: 'Courier New', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
 
-  /* PROGRESS */
   .progress-bar { width: 100%; max-width: 480px; height: 2px; background: rgba(30,22,17,0.06); }
   .progress-fill { height: 100%; background: var(--shu); transition: width 0.4s ease; }
 
-  /* LESSON FILTER */
+  .lesson-filter-wrap { width: 100%; max-width: 480px; position: relative; }
+  .lesson-filter-wrap::after {
+    content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 28px;
+    background: linear-gradient(to right, transparent, var(--card));
+    pointer-events: none; z-index: 1;
+  }
   .lesson-filter {
-    width: 100%; max-width: 480px;
-    background: var(--card);
-    display: flex; gap: 2px; padding: 0 12px;
-    overflow-x: auto; scrollbar-width: none;
-    border-bottom: 1px solid rgba(30,22,17,0.06);
+    background: var(--card); display: flex; gap: 2px; padding: 0 12px;
+    overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(30,22,17,0.06);
     -webkit-overflow-scrolling: touch;
   }
   .lesson-filter::-webkit-scrollbar { display: none; }
   .lbtn {
     flex-shrink: 0; padding: 9px 11px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+    font-family: 'Courier New', monospace; font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--muted); background: none; border: none; cursor: pointer;
     border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
   }
   .lbtn.active { color: var(--shu); border-bottom-color: var(--shu); font-weight: 600; }
 
-  /* CARD */
-  .card-wrap { width: 100%; max-width: 480px; padding: 16px; flex: 1; }
+  .card-wrap { width: 100%; max-width: 480px; padding: 14px; flex: 1; }
 
   @keyframes cardIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
 
   .card {
-    background: var(--card); border-radius: 16px;
-    padding: 22px 22px 20px; position: relative;
-    box-shadow: 0 0 0 1px var(--ring), 0 8px 28px rgba(30,22,17,0.09);
-    min-height: 58vh; animation: cardIn 0.22s ease;
+    background: var(--card); border-radius: 16px; padding: 22px 22px 20px;
+    position: relative;
+    box-shadow: 0 0 0 1px var(--ring), 0 8px 28px rgba(30,22,17,0.08);
+    min-height: 56vh; animation: cardIn 0.22s ease;
   }
 
-  .card-top {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
+  .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .lesson-badge { display: flex; align-items: center; gap: 5px; }
-  .lesson-label {
-    font-family: 'Courier New', monospace;
-    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
-  }
+  .lesson-label { font-family: 'Courier New', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
   .lesson-pill {
-    background: var(--shu-bg); color: var(--shu);
-    padding: 2px 9px; border-radius: 999px;
+    background: var(--shu-bg); color: var(--shu); padding: 2px 9px; border-radius: 999px;
     font-family: 'Courier New', monospace; font-size: 0.6rem; letter-spacing: 0.06em;
-    box-shadow: inset 0 0 0 1px rgba(181,56,15,0.14);
+    box-shadow: inset 0 0 0 1px rgba(155,64,14,0.14);
   }
   .loop-badge {
-    font-family: 'Courier New', monospace; font-size: 0.6rem;
-    padding: 2px 8px; background: var(--shu-bg); color: var(--shu);
-    border-radius: 999px; letter-spacing: 0.06em;
-    box-shadow: inset 0 0 0 1px rgba(181,56,15,0.14); display: none;
+    font-family: 'Courier New', monospace; font-size: 0.6rem; padding: 2px 8px;
+    background: var(--shu-bg); color: var(--shu); border-radius: 999px; letter-spacing: 0.06em;
+    box-shadow: inset 0 0 0 1px rgba(155,64,14,0.14); display: none;
   }
   .loop-badge.visible { display: block; }
 
-  /* WORD */
   .word-main {
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 2.8rem; font-weight: 700; letter-spacing: -0.03em;
-    line-height: 1.2; cursor: pointer; color: var(--ink); margin-bottom: 4px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 2.8rem; font-weight: 700;
+    letter-spacing: -0.03em; line-height: 1.2; cursor: pointer; color: var(--ink); margin-bottom: 4px;
   }
   .word-main:hover { opacity: 0.7; }
   .word-main ruby { display: ruby; }
-  .word-main ruby rt {
-    display: ruby-text; font-size: 0.28em; font-weight: 400;
-    color: var(--ruby); letter-spacing: 0.04em;
-  }
+  .word-main ruby rt { display: ruby-text; font-size: 0.28em; font-weight: 400; color: var(--ruby); letter-spacing: 0.04em; }
 
-  .word-meta {
-    font-family: 'Courier New', monospace; font-size: 0.65rem;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--muted); margin-bottom: 10px;
-  }
-  .word-meaning {
-    font-size: 1.06rem; font-weight: 500; color: var(--ink-mid);
-    margin-bottom: 22px; line-height: 1.65; max-width: 28ch; text-wrap: pretty;
-  }
+  .word-meta { font-family: 'Courier New', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
 
-  /* DIVIDER */
+  .dict-form { display: none; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .dict-form.visible { display: flex; }
+  .dict-label { font-family: 'Courier New', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .dict-word { font-family: 'Noto Sans JP', sans-serif; font-size: 0.95rem; color: var(--dict-col); font-weight: 600; }
+
+  .cn-wrap { position: relative; cursor: pointer; margin-bottom: 22px; display: block; }
+  .word-meaning { font-size: 1.06rem; font-weight: 500; color: var(--ink-mid); line-height: 1.65; max-width: 28ch; text-wrap: pretty; }
+  .cn-cover {
+    position: absolute; inset: -5px -8px; background: var(--bg); border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--ring-sm);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s;
+  }
+  .cn-cover span { font-family: 'Courier New', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .cn-wrap.revealed .cn-cover { opacity: 0; pointer-events: none; }
+
   .divider { height: 1px; background: var(--ring-sm); margin: 0 0 16px; }
 
-  /* SENTENCE */
-  .sentence-label {
-    font-family: 'Courier New', monospace; font-size: 0.6rem;
-    text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px;
-  }
-  .sentence-jp {
-    font-family: 'Noto Sans JP', sans-serif; font-size: 1.1rem;
-    line-height: 2.6; margin-bottom: 10px; cursor: pointer; letter-spacing: 0.02em;
-  }
+  .sentence-label { font-family: 'Courier New', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; }
+  .sentence-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 1.1rem; line-height: 2.6; margin-bottom: 10px; cursor: pointer; letter-spacing: 0.02em; }
   .sentence-jp:hover { opacity: 0.8; }
+  .sentence-empty { font-family: 'Courier New', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
 
-  /* KTV */
-  .ktv-token { display: inline; color: var(--muted); opacity: 0.45; transition: color 0.08s, opacity 0.08s; }
+  .ktv-token { display: inline; color: var(--muted); opacity: 0.4; transition: color 0.08s, opacity 0.08s; }
   .ktv-token ruby { display: ruby; }
-  .ktv-token ruby rt {
-    display: ruby-text; font-size: 0.46em; font-weight: 300;
-    color: var(--muted); letter-spacing: 0.04em; transition: color 0.08s;
-  }
+  .ktv-token ruby rt { display: ruby-text; font-size: 0.46em; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; transition: color 0.08s; }
   .ktv-token.ktv-done { color: var(--ink-mid); opacity: 1; font-weight: 500; }
   .ktv-token.ktv-done ruby rt { color: var(--ruby); }
-  .ktv-token.ktv-now {
-    color: var(--yama); opacity: 1; font-weight: 700;
-    text-shadow: 0 0 10px rgba(196,140,10,0.3);
-  }
+  .ktv-token.ktv-now { color: var(--yama); opacity: 1; font-weight: 700; text-shadow: 0 0 10px rgba(160,120,32,0.25); }
   .ktv-token.ktv-now ruby rt { color: var(--yama); }
 
+  .sent-cn-wrap { position: relative; cursor: pointer; }
   .sentence-meaning { font-size: 0.84rem; color: var(--muted); line-height: 1.75; text-wrap: pretty; }
-
-  /* PLAY STATUS */
-  .play-status { display: flex; align-items: center; gap: 8px; margin-top: 16px; min-height: 22px; }
-  .play-dots { display: flex; gap: 5px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(30,22,17,0.1); transition: background 0.2s; }
-  .dot.active { background: var(--shu); }
-  .dot.done { background: var(--shu-bg); box-shadow: inset 0 0 0 1px rgba(181,56,15,0.2); }
-  .play-status-text {
-    font-family: 'Courier New', monospace; font-size: 0.62rem;
-    color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+  .sent-cn-cover {
+    position: absolute; inset: -4px -8px; background: var(--bg); border-radius: 6px;
+    box-shadow: inset 0 0 0 1px var(--ring-sm);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s;
   }
+  .sent-cn-cover span { font-family: 'Courier New', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .sent-cn-wrap.revealed .sent-cn-cover { opacity: 0; pointer-events: none; }
 
-  /* CONTROLS */
+  .play-status { display: flex; align-items: center; gap: 8px; margin-top: 14px; min-height: 22px; }
+  .play-dots { display: flex; gap: 5px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(30,22,17,0.10); transition: background 0.2s; }
+  .dot.active { background: var(--shu); }
+  .dot.done { background: var(--shu-bg); box-shadow: inset 0 0 0 1px rgba(155,64,14,0.2); }
+  .play-status-text { font-family: 'Courier New', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
   .controls {
-    width: 100%; max-width: 480px; background: var(--card); padding: 13px 18px;
+    width: 100%; max-width: 480px; background: var(--card); padding: 12px 18px;
     position: sticky; bottom: 0;
     box-shadow: 0 0 0 1px var(--ring), 0 -4px 16px rgba(30,22,17,0.06);
   }
-  .controls-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+  .controls-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
 
-  .loop-toggle {
-    display: flex; align-items: center; gap: 6px;
-    font-family: 'Courier New', monospace; font-size: 0.62rem;
-    text-transform: uppercase; letter-spacing: 0.07em;
-    color: var(--muted); cursor: pointer; user-select: none;
+  .tog-group { display: flex; align-items: center; gap: 10px; }
+  .tog-label {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+    cursor: pointer; user-select: none;
   }
-  .loop-toggle input { display: none; }
-  .toggle-track {
-    width: 32px; height: 17px; background: rgba(30,22,17,0.12);
-    border-radius: 9px; position: relative; transition: background 0.2s;
-  }
-  .toggle-track::after {
-    content: ''; position: absolute; width: 11px; height: 11px;
-    border-radius: 50%; background: white; top: 3px; left: 3px;
-    transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-  }
-  .loop-toggle input:checked + .toggle-track { background: var(--shu); }
-  .loop-toggle input:checked + .toggle-track::after { transform: translateX(15px); }
-  .loop-toggle.active { color: var(--shu); }
+  .tog-label input { display: none; }
+  .toggle-track { width: 30px; height: 16px; background: rgba(30,22,17,0.12); border-radius: 8px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .toggle-track::after { content: ''; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .tog-label input:checked + .toggle-track { background: var(--shu); }
+  .tog-label input:checked + .toggle-track::after { transform: translateX(14px); }
+  .tog-label.active { color: var(--shu); }
 
   .speed-group { display: flex; gap: 4px; align-items: center; }
-  .speed-label-sm {
-    font-family: 'Courier New', monospace; font-size: 0.6rem;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
-  }
-  .speed-btn {
-    height: 26px; padding: 0 10px;
-    font-family: 'Courier New', monospace; font-size: 0.6rem;
-    text-transform: uppercase; letter-spacing: 0.04em;
-    border: 1px solid rgba(30,22,17,0.12); background: transparent;
-    cursor: pointer; color: var(--muted); border-radius: 999px;
-    transition: all 0.12s; display: flex; align-items: center;
-  }
+  .speed-label-sm { font-family: 'Courier New', monospace; font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .speed-btn { height: 24px; padding: 0 9px; font-family: 'Courier New', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid rgba(30,22,17,0.12); background: transparent; cursor: pointer; color: var(--muted); border-radius: 999px; transition: all 0.12s; display: flex; align-items: center; }
   .speed-btn.active { background: var(--shu); color: white; border-color: var(--shu); }
 
-  .nav-row { display: flex; align-items: center; gap: 9px; }
-  .btn-nav {
-    flex: 1; height: 38px;
-    border: 1.5px solid rgba(30,22,17,0.12); background: transparent;
-    cursor: pointer; font-size: 0.85rem; border-radius: 999px;
-    transition: all 0.14s; display: flex; align-items: center; justify-content: center;
-    color: var(--ink-mid);
-  }
+  .nav-row { display: flex; align-items: center; gap: 8px; }
+  .btn-nav { flex: 0.7; height: 38px; border: 1.5px solid rgba(30,22,17,0.12); background: transparent; cursor: pointer; font-size: 0.85rem; border-radius: 999px; transition: all 0.14s; display: flex; align-items: center; justify-content: center; color: var(--ink-mid); }
   .btn-nav:hover { background: var(--bg2); }
   .btn-nav:active { transform: scale(0.96); }
 
-  .btn-play-main {
-    flex: 2; height: 38px; background: var(--shu); color: white;
-    border: none; cursor: pointer;
-    font-family: 'Courier New', monospace; font-size: 0.72rem; font-weight: 600;
+  .btn-play {
+    flex: 1.3; height: 38px; border: none; cursor: pointer;
+    font-family: 'Courier New', monospace; font-size: 0.68rem; font-weight: 600;
     border-radius: 999px; transition: all 0.14s;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
     letter-spacing: 0.06em; text-transform: uppercase;
-    box-shadow: 0 0 0 1px rgba(181,56,15,0.2);
   }
-  .btn-play-main:hover { filter: brightness(1.08); }
-  .btn-play-main:active { transform: scale(0.97); }
-  .btn-play-main.playing { background: var(--kon); box-shadow: 0 0 0 1px rgba(30,58,110,0.2); }
+  .btn-word { background: var(--shu); color: white; box-shadow: 0 0 0 1px rgba(155,64,14,0.2); }
+  .btn-word:hover { filter: brightness(1.1); }
+  .btn-word.playing { background: var(--kon); }
+  .btn-sent { background: transparent; color: var(--shu); border: 1.5px solid rgba(155,64,14,0.35); }
+  .btn-sent:hover:not(:disabled) { background: var(--shu-bg); }
+  .btn-sent.playing { background: var(--kon); color: white; border-color: transparent; }
+  .btn-sent:disabled { opacity: 0.3; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -251,14 +209,16 @@
     <span class="header-title">標準日本語</span>
     <span class="header-sub">初級</span>
   </div>
-  <div class="header-counter" id="headerCounter">1 / 20</div>
+  <div class="header-counter" id="headerCounter">1 / 384</div>
 </div>
 <div class="progress-bar">
-  <div class="progress-fill" id="progressFill" style="width:5%"></div>
+  <div class="progress-fill" id="progressFill" style="width:0.3%"></div>
 </div>
 
-<div class="lesson-filter" id="lessonFilter">
-  <button class="lbtn active" onclick="filterLesson(0)" id="btnAll">ALL</button>
+<div class="lesson-filter-wrap">
+  <div class="lesson-filter" id="lessonFilter">
+    <button class="lbtn active" onclick="filterLesson(0)" id="btnAll">ALL</button>
+  </div>
 </div>
 
 <div class="card-wrap">
@@ -273,13 +233,26 @@
 
     <div class="word-main" id="wordMain" onclick="speakWord()"></div>
     <div class="word-meta" id="wordMeta"></div>
-    <div class="word-meaning" id="wordMeaning"></div>
+    <div class="dict-form" id="dictForm">
+      <span class="dict-label">辞書形</span>
+      <span class="dict-word" id="dictWord"></span>
+    </div>
+
+    <div class="cn-wrap" id="meaningWrap" onclick="revealMeaning()">
+      <div class="word-meaning" id="wordMeaning"></div>
+      <div class="cn-cover"><span>點擊查看中文</span></div>
+    </div>
 
     <div class="divider"></div>
 
     <div class="sentence-label">例句</div>
     <div class="sentence-jp" id="sentenceJp" onclick="speakSentence()"></div>
-    <div class="sentence-meaning" id="sentenceMeaning"></div>
+    <div class="sentence-empty" id="sentenceEmpty" style="display:none">— 例句未設定 —</div>
+
+    <div class="sent-cn-wrap" id="sentMeaningWrap" onclick="revealSentMeaning()">
+      <div class="sentence-meaning" id="sentenceMeaning"></div>
+      <div class="sent-cn-cover"><span>點擊查看中文</span></div>
+    </div>
 
     <div class="play-status" id="playStatus" style="display:none">
       <div class="play-dots">
@@ -294,11 +267,18 @@
 
 <div class="controls">
   <div class="controls-top">
-    <label class="loop-toggle" id="loopLabel">
-      <input type="checkbox" id="loopToggle" onchange="toggleLoop()">
-      <div class="toggle-track"></div>
-      Loop
-    </label>
+    <div class="tog-group">
+      <label class="tog-label" id="loopLabel">
+        <input type="checkbox" id="loopToggle" onchange="toggleLoop()">
+        <div class="toggle-track"></div>
+        Loop
+      </label>
+      <label class="tog-label" id="cnLabel">
+        <input type="checkbox" id="cnToggle">
+        <div class="toggle-track"></div>
+        中日
+      </label>
+    </div>
     <div class="speed-group">
       <span class="speed-label-sm">Speed</span>
       <button class="speed-btn" onclick="setSpeed(0.6)" id="spd06">Slow</button>
@@ -308,9 +288,11 @@
   </div>
   <div class="nav-row">
     <button class="btn-nav" onclick="prevCard()">◀</button>
-    <button class="btn-play-main" id="btnPlayMain" onclick="playCard()">
-      <span id="btnPlayIcon">▶</span>
-      <span id="btnPlayText">朗讀 × 3</span>
+    <button class="btn-play btn-word" id="btnWord" onclick="playWord()">
+      <span id="btnWordIcon">▶</span><span id="btnWordText">単字 ×3</span>
+    </button>
+    <button class="btn-play btn-sent" id="btnSent" onclick="playSentence()">
+      <span id="btnSentIcon">▶</span><span id="btnSentText">例句</span>
     </button>
     <button class="btn-nav" onclick="nextCard()">▶</button>
   </div>
@@ -707,8 +689,9 @@ const CARDS = [
 const ALL_LESSONS = [...new Set(CARDS.map(c => c.lesson))].sort((a,b) => a-b);
 let filteredCards = [...CARDS];
 let current = 0, speed = 0.85;
-let isLooping = false, isPlaying = false;
-let loopTimer = null, ktvTimer = null, ttsVoice = null;
+let isLooping = false, isPlaying = false, playingWhat = null;
+let loopTimer = null, ktvTimer = null;
+let ttsVoice = null, ttsVoiceCN = null;
 
 function buildFilter() {
   const el = document.getElementById('lessonFilter');
@@ -733,12 +716,49 @@ function initTTS() {
   const load = () => {
     const voices = speechSynthesis.getVoices();
     const ja = voices.filter(v => v.lang.startsWith('ja'));
+    const zh = voices.filter(v => v.lang.startsWith('zh'));
     if (ja.length) ttsVoice = ja.find(v => /Kyoko|O-Ren|Female|female/i.test(v.name)) || ja[0];
+    if (zh.length) ttsVoiceCN = zh.find(v => /TW|HK|Traditional/i.test(v.name)) || zh[0];
   };
   speechSynthesis.getVoices().length ? load() : (speechSynthesis.onvoiceschanged = load);
 }
 
+function utter(text, lang, onEnd) {
+  if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = speed; u.pitch = 1.0;
+  if (lang === 'ja-JP' && ttsVoice) u.voice = ttsVoice;
+  if (lang === 'zh-TW' && ttsVoiceCN) u.voice = ttsVoiceCN;
+  u.onend = () => { if (onEnd) onEnd(); };
+  u.onerror = () => { if (onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+
+function getDictForm(word, reading, type) {
+  if (!type || !type.match(/動/)) return null;
+  const wEnds = word.endsWith('ます');
+  const rEnds = reading && reading.endsWith('ます');
+  if (!wEnds && !rEnds) return null;
+  const wStem = wEnds ? word.slice(0, -2) : word;
+  const rStem = (rEnds && reading) ? reading.slice(0, -2) : (reading || '');
+  const last = rStem[rStem.length - 1] || '';
+  if (type.match(/三|3/)) {
+    if (last === 'し') return wStem.slice(0, -1) + 'する';
+    return wStem + 'する';
+  }
+  if (type.match(/二|2/)) return wStem + 'る';
+  if (type.match(/一|1/)) {
+    const g1 = {'き':'く','ぎ':'ぐ','し':'す','ち':'つ','に':'ぬ','び':'ぶ','み':'む','り':'る','い':'う','ひ':'ふ'};
+    return wStem.slice(0, -1) + (g1[last] || 'う');
+  }
+  const g1 = {'き':'く','ぎ':'ぐ','し':'す','ち':'つ','び':'ぶ','み':'む','り':'る','い':'う'};
+  if (g1[last]) return wStem.slice(0, -1) + g1[last];
+  return wStem + 'る';
+}
+
 function renderRuby(s) {
+  if (!s) return '';
   return s.split(' ').map(t => {
     if (t.includes('|')) { const [b, r] = t.split('|'); return `<ruby>${b}<rt>${r}</rt></ruby>`; }
     return t;
@@ -746,6 +766,7 @@ function renderRuby(s) {
 }
 
 function renderKTV(s) {
+  if (!s) return '';
   return s.split(' ').map((t, i) => {
     if (!t.trim()) return '';
     if (t.includes('|')) {
@@ -761,17 +782,37 @@ function renderCard() {
   const el = document.getElementById('card');
   el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
 
+  document.getElementById('meaningWrap').classList.remove('revealed');
+  document.getElementById('sentMeaningWrap').classList.remove('revealed');
+
   document.getElementById('lessonNum').textContent = '第 ' + c.lesson + ' 課';
   document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
   document.getElementById('wordMeta').textContent = c.type;
   document.getElementById('wordMeaning').textContent = c.meaning;
-  document.getElementById('sentenceJp').innerHTML = c.sentence ? renderKTV(c.sentence) : '<span style="color:var(--muted)">—</span>';
-  document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning || '';
+
+  const df = getDictForm(c.word, c.reading, c.type);
+  const dfEl = document.getElementById('dictForm');
+  if (df) { document.getElementById('dictWord').textContent = df; dfEl.classList.add('visible'); }
+  else { dfEl.classList.remove('visible'); }
+
+  const hasS = !!(c.sentence && c.sentence.trim());
+  document.getElementById('sentenceJp').style.display = hasS ? '' : 'none';
+  document.getElementById('sentenceEmpty').style.display = hasS ? 'none' : 'block';
+  document.getElementById('sentMeaningWrap').style.display = hasS ? '' : 'none';
+  if (hasS) {
+    document.getElementById('sentenceJp').innerHTML = renderKTV(c.sentence);
+    document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning || '';
+  }
+  document.getElementById('btnSent').disabled = !hasS;
+
   document.getElementById('headerCounter').textContent = (current + 1) + ' / ' + filteredCards.length;
   document.getElementById('progressFill').style.width = ((current + 1) / filteredCards.length * 100) + '%';
   resetDots();
   document.getElementById('playStatus').style.display = 'none';
 }
+
+function revealMeaning() { document.getElementById('meaningWrap').classList.add('revealed'); }
+function revealSentMeaning() { document.getElementById('sentMeaningWrap').classList.add('revealed'); }
 
 function resetDots() { [1,2,3].forEach(i => document.getElementById('dot' + i).className = 'dot'); }
 function setDot(n, s) { document.getElementById('dot' + n).className = 'dot ' + s; }
@@ -800,66 +841,88 @@ function stopKTV() {
 
 function rawText(s) { return s.replace(/\|[^\s|]*/g, '').replace(/\s+/g, ''); }
 
-function utter(text, onEnd) {
-  if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP'; u.rate = speed; u.pitch = 1.0;
-  if (ttsVoice) u.voice = ttsVoice;
-  u.onend = () => { if (onEnd) onEnd(); };
-  u.onerror = () => { if (onEnd) onEnd(); };
-  speechSynthesis.speak(u);
-}
-
-function speakWord() { utter(filteredCards[current].word); }
-
+function speakWord() { utter(filteredCards[current].word, 'ja-JP'); }
 function speakSentence() {
   const c = filteredCards[current];
   if (!c.sentence) return;
   stopKTV(); startKTV();
-  utter(rawText(c.sentence));
+  utter(rawText(c.sentence), 'ja-JP');
 }
 
-function playCard() {
-  if (isPlaying) { stopPlay(); return; }
-  isPlaying = true; setBtnPlaying(true);
+function playWord() {
+  if (isPlaying && playingWhat === 'word') { stopPlay(); return; }
+  if (isPlaying) stopPlay();
+  isPlaying = true; playingWhat = 'word';
+  setBtnState('word', true);
   document.getElementById('playStatus').style.display = 'flex';
   resetDots();
   const c = filteredCards[current];
-  const sent = c.sentence ? rawText(c.sentence) : null;
+  const cnMode = document.getElementById('cnToggle').checked;
   let rep = 0;
   function round() {
     if (!isPlaying) return;
-    if (++rep > 3) { finishPlay(); return; }
+    if (++rep > 3) {
+      if (cnMode) {
+        document.getElementById('playStatusText').textContent = 'CN';
+        utter(c.meaning, 'zh-TW', () => { finishPlay(); });
+      } else { finishPlay(); }
+      return;
+    }
     setDot(rep, 'active');
     document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-    utter(c.word, () => {
+    utter(c.word, 'ja-JP', () => {
       if (!isPlaying) return;
-      if (!sent) { setDot(rep, 'done'); setTimeout(() => { if (isPlaying) round(); }, 400); return; }
-      setTimeout(() => {
-        if (!isPlaying) return;
-        stopKTV(); startKTV();
-        utter(sent, () => {
-          if (!isPlaying) return;
-          setDot(rep, 'done');
-          setTimeout(() => { if (isPlaying) round(); }, 600);
-        });
-      }, 400);
+      setDot(rep, 'done');
+      setTimeout(() => { if (isPlaying) round(); }, 500);
+    });
+  }
+  round();
+}
+
+function playSentence() {
+  const c = filteredCards[current];
+  if (!c.sentence) return;
+  if (isPlaying && playingWhat === 'sent') { stopPlay(); return; }
+  if (isPlaying) stopPlay();
+  isPlaying = true; playingWhat = 'sent';
+  setBtnState('sent', true);
+  document.getElementById('playStatus').style.display = 'flex';
+  resetDots();
+  const cnMode = document.getElementById('cnToggle').checked;
+  const sent = rawText(c.sentence);
+  let rep = 0;
+  function round() {
+    if (!isPlaying) return;
+    if (++rep > 3) {
+      if (cnMode && c.sentenceMeaning) {
+        document.getElementById('playStatusText').textContent = 'CN';
+        utter(c.sentenceMeaning, 'zh-TW', () => { finishPlay(); });
+      } else { finishPlay(); }
+      return;
+    }
+    setDot(rep, 'active');
+    document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
+    stopKTV(); startKTV();
+    utter(sent, 'ja-JP', () => {
+      if (!isPlaying) return;
+      setDot(rep, 'done');
+      setTimeout(() => { if (isPlaying) round(); }, 600);
     });
   }
   round();
 }
 
 function stopPlay() {
-  isPlaying = false;
+  isPlaying = false; playingWhat = null;
   speechSynthesis.cancel && speechSynthesis.cancel();
-  setBtnPlaying(false);
+  setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
   stopKTV(); resetDots();
 }
 
 function finishPlay() {
-  isPlaying = false; setBtnPlaying(false);
+  isPlaying = false; playingWhat = null;
+  setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatusText').textContent = '完成 ✓';
   setTimeout(() => { document.getElementById('playStatus').style.display = 'none'; }, 1200);
   stopKTV();
@@ -867,15 +930,21 @@ function finishPlay() {
     loopTimer = setTimeout(() => {
       if (!isLooping) return;
       nextCard();
-      setTimeout(() => { if (isLooping) playCard(); }, 600);
+      setTimeout(() => { if (isLooping) playWord(); }, 600);
     }, 800);
   }
 }
 
-function setBtnPlaying(p) {
-  document.getElementById('btnPlayIcon').textContent = p ? '■' : '▶';
-  document.getElementById('btnPlayText').textContent = p ? 'Stop' : '朗讀 × 3';
-  document.getElementById('btnPlayMain').classList.toggle('playing', p);
+function setBtnState(which, playing) {
+  if (which === 'word') {
+    document.getElementById('btnWordIcon').textContent = playing ? '■' : '▶';
+    document.getElementById('btnWordText').textContent = playing ? 'Stop' : '単字 ×3';
+    document.getElementById('btnWord').classList.toggle('playing', playing);
+  } else {
+    document.getElementById('btnSentIcon').textContent = playing ? '■' : '▶';
+    document.getElementById('btnSentText').textContent = playing ? 'Stop' : '例句';
+    document.getElementById('btnSent').classList.toggle('playing', playing);
+  }
 }
 
 function prevCard() { stopPlay(); clearTimeout(loopTimer); current = (current - 1 + filteredCards.length) % filteredCards.length; renderCard(); }
@@ -891,8 +960,8 @@ function toggleLoop() {
 function setSpeed(s) {
   speed = s;
   ['spd06','spd085','spd10'].forEach(id => document.getElementById(id).classList.remove('active'));
-  const map = { 0.6:'spd06', 0.85:'spd085', 1.0:'spd10' };
-  if (map[s]) document.getElementById(map[s]).classList.add('active');
+  const m = { 0.6:'spd06', 0.85:'spd085', 1.0:'spd10' };
+  if (m[s]) document.getElementById(m[s]).classList.add('active');
 }
 
 let tx = 0;
