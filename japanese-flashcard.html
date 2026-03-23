@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日語單字卡 N4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f7;
+    --ink: #1a1a1a;
+    --muted: #888;
+    --border: #e0e0e0;
+    --accent: #2c5f8a;
+    --accent2: #e8f0f8;
+    --ruby: #555;
+    --progress: #2c5f8a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg2);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HEADER */
+  .header {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .header-title { font-size: 1rem; font-weight: 500; letter-spacing: 0.05em; }
+  .header-counter { font-size: 0.8rem; color: var(--muted); }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    width: 100%;
+    max-width: 480px;
+    height: 3px;
+    background: var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--progress);
+    transition: width 0.4s ease;
+  }
+
+  /* CARD */
+  .card-wrap {
+    width: 100%;
+    max-width: 480px;
+    padding: 0;
+    flex: 1;
+  }
+
+  .card {
+    background: var(--bg);
+    min-height: 70vh;
+    padding: 32px 28px 24px;
+    position: relative;
+  }
+
+  /* WORD SECTION */
+  .word-reading {
+    font-size: 0.75rem;
+    color: var(--ruby);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+    font-weight: 300;
+  }
+
+  .word-main {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .word-main:hover { opacity: 0.8; }
+
+  .word-main ruby { display: inline-flex; flex-direction: column-reverse; align-items: center; }
+  .word-main ruby rt {
+    font-size: 0.3em;
+    font-weight: 400;
+    color: var(--ruby);
+    letter-spacing: 0.06em;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .word-meta {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .word-meaning {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 24px;
+  }
+
+  /* SENTENCE SECTION */
+  .sentence-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .sentence-jp {
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 2.4;
+    margin-bottom: 8px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+  }
+  .sentence-jp:hover { opacity: 0.75; }
+
+  .sentence-jp ruby { display: inline-flex; flex-direction: column-reverse; align-items: center; margin: 0 0.5px; }
+  .sentence-jp ruby rt {
+    font-size: 0.48em;
+    font-weight: 300;
+    color: var(--ruby);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .sentence-meaning {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* PLAY STATUS */
+  .play-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    min-height: 28px;
+  }
+  .play-dots { display: flex; gap: 5px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+  .dot.active { background: var(--accent); }
+  .dot.done { background: #aac8e4; }
+  .play-status-text {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* BOTTOM CONTROLS */
+  .controls {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky;
+    bottom: 0;
+  }
+
+  .controls-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .loop-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .loop-toggle input { display: none; }
+  .toggle-track {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .loop-toggle input:checked + .toggle-track { background: var(--accent); }
+  .loop-toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+  .loop-toggle.active { color: var(--accent); }
+
+  .speed-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .speed-label-sm { font-size: 0.7rem; color: var(--muted); }
+  .speed-btn {
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    color: var(--muted);
+    border-radius: 20px;
+    transition: all 0.12s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .speed-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-nav {
+    flex: 1;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-nav:hover { background: var(--bg2); }
+  .btn-nav:active { transform: scale(0.97); }
+
+  .btn-play-main {
+    flex: 2;
+    padding: 12px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: 'Noto Sans JP', sans-serif;
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    letter-spacing: 0.04em;
+  }
+  .btn-play-main:hover { background: #1e4a6e; }
+  .btn-play-main:active { transform: scale(0.98); }
+  .btn-play-main.playing { background: #e07b39; }
+  .btn-play-main.playing:hover { background: #c06020; }
+
+  /* LOOP INDICATOR */
+  .loop-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 0.62rem;
+    padding: 2px 8px;
+    background: var(--accent2);
+    color: var(--accent);
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    display: none;
+  }
+  .loop-badge.visible { display: block; }
+
+  /* ANIMATE */
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+  .card { animation: fadeIn 0.25s ease; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">日語單字卡 N4</div>
+  <div class="header-right">
+    <div class="header-counter" id="headerCounter">1 / 20</div>
+  </div>
+</div>
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill" style="width:5%"></div>
+</div>
+
+<div class="card-wrap">
+  <div class="card" id="card">
+    <div class="loop-badge" id="loopBadge">🔁 輪播中</div>
+
+    <!-- WORD -->
+    <div class="word-reading" id="wordReading"></div>
+    <div class="word-main" id="wordMain" onclick="speakWord()"></div>
+    <div class="word-meta" id="wordMeta"></div>
+    <div class="word-meaning" id="wordMeaning"></div>
+
+    <div class="divider"></div>
+
+    <!-- SENTENCE -->
+    <div class="sentence-label">例句</div>
+    <div class="sentence-jp" id="sentenceJp" onclick="speakSentence()"></div>
+    <div class="sentence-meaning" id="sentenceMeaning"></div>
+
+    <!-- PLAY STATUS (3 dots) -->
+    <div class="play-status" id="playStatus" style="display:none">
+      <div class="play-dots">
+        <div class="dot" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+        <div class="dot" id="dot3"></div>
+      </div>
+      <div class="play-status-text" id="playStatusText"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-top">
+    <label class="loop-toggle" id="loopLabel">
+      <input type="checkbox" id="loopToggle" onchange="toggleLoop()">
+      <div class="toggle-track"></div>
+      全部輪播
+    </label>
+    <div class="speed-group">
+      <span class="speed-label-sm">速度</span>
+      <button class="speed-btn" onclick="setSpeed(0.6)" id="spd06">慢</button>
+      <button class="speed-btn active" onclick="setSpeed(0.85)" id="spd085">中</button>
+      <button class="speed-btn" onclick="setSpeed(1.0)" id="spd10">正常</button>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav" onclick="prevCard()" title="上一張">◀</button>
+    <button class="btn-play-main" id="btnPlayMain" onclick="playCard()">
+      <span id="btnPlayIcon">▶</span>
+      <span id="btnPlayText">朗讀 × 3</span>
+    </button>
+    <button class="btn-nav" onclick="nextCard()" title="下一張">▶</button>
+  </div>
+</div>
+
+<script>
+// ===== N4 WORD DATABASE =====
+// format: word, reading, type, meaning, sentence (with ruby markup), sentenceReading, sentenceMeaning
+const CARDS = [
+  {
+    word: '明るい', ruby: '明|あか るい', reading: 'あかるい',
+    type: 'い形容詞', meaning: '開朗的、明亮的',
+    sentence: '明|あか るい 人|ひと が 好|す きです。',
+    sentenceMeaning: '我喜歡開朗的人。'
+  },
+  {
+    word: '集める', ruby: '集|あつ める', reading: 'あつめる',
+    type: '動詞（他）', meaning: '收集、蒐集',
+    sentence: '切手|きって を 集|あつ めるのが 趣味|しゅみ です。',
+    sentenceMeaning: '集郵是我的興趣。'
+  },
+  {
+    word: '安全', ruby: '安全|あんぜん', reading: 'あんぜん',
+    type: '名詞・な形容詞', meaning: '安全',
+    sentence: 'この 道|みち は 夜|よる でも 安全|あんぜん です。',
+    sentenceMeaning: '這條路晚上也很安全。'
+  },
+  {
+    word: '以外', ruby: '以外|いがい', reading: 'いがい',
+    type: '名詞', meaning: '以外、除了…之外',
+    sentence: '日曜日|にちようび 以外|いがい は 毎日|まいにち 働|はたら きます。',
+    sentenceMeaning: '除了星期天以外每天都工作。'
+  },
+  {
+    word: '急ぐ', ruby: '急|いそ ぐ', reading: 'いそぐ',
+    type: '動詞（自）', meaning: '趕快、急忙',
+    sentence: '電車|でんしゃ に 遅|おく れそうなので 急|いそ いでください。',
+    sentenceMeaning: '快要趕不上電車了，請快點。'
+  },
+  {
+    word: '運動', ruby: '運動|うんどう', reading: 'うんどう',
+    type: '名詞・動詞', meaning: '運動',
+    sentence: '毎朝|まいあさ 30 分|ふん 運動|うんどう しています。',
+    sentenceMeaning: '每天早上運動30分鐘。'
+  },
+  {
+    word: '遠慮', ruby: '遠慮|えんりょ', reading: 'えんりょ',
+    type: '名詞・動詞', meaning: '客氣、顧慮',
+    sentence: '遠慮|えんりょ しないで、もっと 食|た べてください。',
+    sentenceMeaning: '別客氣，請多吃一點。'
+  },
+  {
+    word: '起こす', ruby: '起|お こす', reading: 'おこす',
+    type: '動詞（他）', meaning: '叫醒、引起',
+    sentence: '明日|あした 7 時|じ に 起|お こしてください。',
+    sentenceMeaning: '明天請在7點叫醒我。'
+  },
+  {
+    word: '送る', ruby: '送|おく る', reading: 'おくる',
+    type: '動詞（他）', meaning: '寄送、送行',
+    sentence: '荷物|にもつ を 海外|かいがい に 送|おく りました。',
+    sentenceMeaning: '把行李寄到了國外。'
+  },
+  {
+    word: '落とす', ruby: '落|お とす', reading: 'おとす',
+    type: '動詞（他）', meaning: '掉落、遺失',
+    sentence: '財布|さいふ を 落|お としてしまいました。',
+    sentenceMeaning: '不小心把錢包掉了。'
+  },
+  {
+    word: '思い出す', ruby: '思|おも い 出|だ す', reading: 'おもいだす',
+    type: '動詞（他）', meaning: '想起、回想',
+    sentence: 'この 歌|うた を 聞|き くと 子供|こども のころを 思|おも い 出|だ します。',
+    sentenceMeaning: '聽到這首歌就會想起小時候。'
+  },
+  {
+    word: '変える', ruby: '変|か える', reading: 'かえる',
+    type: '動詞（他）', meaning: '改變',
+    sentence: '計画|けいかく を 変|か えることにしました。',
+    sentenceMeaning: '決定改變計劃了。'
+  },
+  {
+    word: '確認', ruby: '確認|かくにん', reading: 'かくにん',
+    type: '名詞・動詞', meaning: '確認',
+    sentence: '予約|よやく の 時間|じかん を 確認|かくにん してください。',
+    sentenceMeaning: '請確認預約的時間。'
+  },
+  {
+    word: '気をつける', ruby: '気|き をつける', reading: 'きをつける',
+    type: '動詞', meaning: '小心、注意',
+    sentence: '道|みち を 渡|わた るとき 気|き をつけてください。',
+    sentenceMeaning: '過馬路的時候請小心。'
+  },
+  {
+    word: '経験', ruby: '経験|けいけん', reading: 'けいけん',
+    type: '名詞・動詞', meaning: '經驗、體驗',
+    sentence: '海外|かいがい で 働|はたら いた 経験|けいけん があります。',
+    sentenceMeaning: '有在海外工作的經驗。'
+  },
+  {
+    word: '混む', ruby: '混|こ む', reading: 'こむ',
+    type: '動詞（自）', meaning: '擁擠',
+    sentence: '朝|あさ の 電車|でんしゃ はいつも 混|こ んでいます。',
+    sentenceMeaning: '早上的電車總是很擁擠。'
+  },
+  {
+    word: '残念', ruby: '残念|ざんねん', meaning: '可惜、遺憾',
+    reading: 'ざんねん', type: 'な形容詞',
+    sentence: '試合|しあい に 負|ま けて 残念|ざんねん です。',
+    sentenceMeaning: '比賽輸了，很遺憾。'
+  },
+  {
+    word: '準備', ruby: '準備|じゅんび', reading: 'じゅんび',
+    type: '名詞・動詞', meaning: '準備',
+    sentence: '旅行|りょこう の 準備|じゅんび はもうできましたか。',
+    sentenceMeaning: '旅行的準備好了嗎？'
+  },
+  {
+    word: '連絡', ruby: '連絡|れんらく', reading: 'れんらく',
+    type: '名詞・動詞', meaning: '聯絡、通知',
+    sentence: '何|なに かあったらすぐ 連絡|れんらく してください。',
+    sentenceMeaning: '有什麼事請立刻聯絡我。'
+  },
+  {
+    word: '丁寧', ruby: '丁寧|ていねい', reading: 'ていねい',
+    type: 'な形容詞', meaning: '有禮貌的、仔細的',
+    sentence: 'あの 店員|てんいん はとても 丁寧|ていねい に 説明|せつめい してくれました。',
+    sentenceMeaning: '那位店員非常有禮貌地為我說明了。'
+  },
+];
+
+// ===== STATE =====
+let current = 0;
+let speed = 0.85;
+let isLooping = false;
+let isPlaying = false;
+let loopTimer = null;
+let ttsVoice = null;
+
+// ===== TTS INIT =====
+function initTTS() {
+  if (!('speechSynthesis' in window)) return;
+  const load = () => {
+    const voices = speechSynthesis.getVoices();
+    const ja = voices.filter(v => v.lang.startsWith('ja'));
+    if (ja.length) ttsVoice = ja.find(v => /Kyoko|O-Ren|Female|female/.test(v.name)) || ja[0];
+  };
+  if (speechSynthesis.getVoices().length) load();
+  else speechSynthesis.onvoiceschanged = load;
+}
+
+// ===== RUBY RENDERER =====
+// format: "漢字|よみ 漢字2|よみ2 ..."
+function renderRuby(rubyStr) {
+  if (!rubyStr) return rubyStr;
+  return rubyStr.split(' ').map(token => {
+    if (token.includes('|')) {
+      const [base, rt] = token.split('|');
+      return `<ruby>${base}<rt>${rt}</rt></ruby>`;
+    }
+    return token;
+  }).join('');
+}
+
+// ===== RENDER CARD =====
+function renderCard() {
+  const c = CARDS[current];
+  // Trigger re-animation
+  const card = document.getElementById('card');
+  card.style.animation = 'none';
+  card.offsetHeight; // reflow
+  card.style.animation = '';
+
+  document.getElementById('wordReading').textContent = c.reading;
+  document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
+  document.getElementById('wordMeta').textContent = '（' + c.type + '）';
+  document.getElementById('wordMeaning').textContent = c.meaning;
+  document.getElementById('sentenceJp').innerHTML = renderRuby(c.sentence);
+  document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning;
+  document.getElementById('headerCounter').textContent = `${current + 1} / ${CARDS.length}`;
+  document.getElementById('progressFill').style.width = ((current + 1) / CARDS.length * 100) + '%';
+  resetDots();
+  document.getElementById('playStatus').style.display = 'none';
+}
+
+// ===== DOTS =====
+function resetDots() {
+  [1,2,3].forEach(i => {
+    const d = document.getElementById('dot' + i);
+    d.className = 'dot';
+  });
+}
+
+function setDot(n, state) {
+  // state: 'active' | 'done'
+  const d = document.getElementById('dot' + n);
+  d.className = 'dot ' + state;
+}
+
+// ===== SPEAK =====
+function utter(text, onEnd) {
+  if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = speed;
+  u.pitch = 1.0;
+  if (ttsVoice) u.voice = ttsVoice;
+  u.onend = () => { if (onEnd) onEnd(); };
+  u.onerror = () => { if (onEnd) onEnd(); };
+  speechSynthesis.speak(u);
+}
+
+function speakWord() {
+  const c = CARDS[current];
+  utter(c.word);
+}
+
+function speakSentence() {
+  const c = CARDS[current];
+  utter(c.sentence.replace(/\|[^\s]*/g, '').replace(/\s+/g, ''));
+}
+
+// Raw Japanese text (strip ruby markup)
+function rawText(str) {
+  return str.replace(/\|[^\s|]*/g, '').replace(/\s+/g, '');
+}
+
+// ===== PLAY CARD (word + sentence × 3) =====
+function playCard() {
+  if (isPlaying) {
+    stopPlay();
+    return;
+  }
+  isPlaying = true;
+  setBtnPlaying(true);
+  document.getElementById('playStatus').style.display = 'flex';
+  resetDots();
+
+  const c = CARDS[current];
+  const word = c.word;
+  const sentence = rawText(c.sentence);
+
+  let rep = 0;
+
+  function playRound() {
+    if (!isPlaying) return;
+    rep++;
+    if (rep > 3) {
+      finishPlay();
+      return;
+    }
+    setDot(rep, 'active');
+    document.getElementById('playStatusText').textContent = `第 ${rep} 次`;
+
+    // speak word, then after short pause speak sentence
+    utter(word, () => {
+      if (!isPlaying) return;
+      setTimeout(() => {
+        if (!isPlaying) return;
+        utter(sentence, () => {
+          if (!isPlaying) return;
+          setDot(rep, 'done');
+          setTimeout(() => {
+            if (!isPlaying) return;
+            playRound();
+          }, 600);
+        });
+      }, 400);
+    });
+  }
+
+  playRound();
+}
+
+function stopPlay() {
+  isPlaying = false;
+  speechSynthesis.cancel && speechSynthesis.cancel();
+  setBtnPlaying(false);
+  document.getElementById('playStatus').style.display = 'none';
+  resetDots();
+}
+
+function finishPlay() {
+  isPlaying = false;
+  setBtnPlaying(false);
+  document.getElementById('playStatusText').textContent = '完成 ✓';
+  setTimeout(() => {
+    document.getElementById('playStatus').style.display = 'none';
+  }, 1200);
+
+  if (isLooping) {
+    // Move to next card after delay
+    loopTimer = setTimeout(() => {
+      if (!isLooping) return;
+      nextCard();
+      setTimeout(() => {
+        if (isLooping) playCard();
+      }, 600);
+    }, 800);
+  }
+}
+
+function setBtnPlaying(playing) {
+  const btn = document.getElementById('btnPlayMain');
+  const icon = document.getElementById('btnPlayIcon');
+  const text = document.getElementById('btnPlayText');
+  if (playing) {
+    btn.classList.add('playing');
+    icon.textContent = '■';
+    text.textContent = '停止';
+  } else {
+    btn.classList.remove('playing');
+    icon.textContent = '▶';
+    text.textContent = '朗讀 × 3';
+  }
+}
+
+// ===== NAV =====
+function prevCard() {
+  stopPlay();
+  clearTimeout(loopTimer);
+  current = (current - 1 + CARDS.length) % CARDS.length;
+  renderCard();
+}
+
+function nextCard() {
+  stopPlay();
+  clearTimeout(loopTimer);
+  current = (current + 1) % CARDS.length;
+  renderCard();
+}
+
+// ===== LOOP =====
+function toggleLoop() {
+  isLooping = document.getElementById('loopToggle').checked;
+  const label = document.getElementById('loopLabel');
+  const badge = document.getElementById('loopBadge');
+  label.classList.toggle('active', isLooping);
+  badge.classList.toggle('visible', isLooping);
+  if (!isLooping) {
+    clearTimeout(loopTimer);
+  }
+}
+
+// ===== SPEED =====
+function setSpeed(s) {
+  speed = s;
+  ['spd06','spd085','spd10'].forEach(id => document.getElementById(id).classList.remove('active'));
+  const map = {0.6:'spd06', 0.85:'spd085', 1.0:'spd10'};
+  if (map[s]) document.getElementById(map[s]).classList.add('active');
+}
+
+// ===== SWIPE (mobile) =====
+let touchStartX = 0;
+document.getElementById('card').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+document.getElementById('card').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) nextCard(); else prevCard();
+  }
+}, {passive:true});
+
+// ===== INIT =====
+initTTS();
+renderCard();
+</script>
+</body>
+</html>
