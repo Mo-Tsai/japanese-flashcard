@@ -538,7 +538,6 @@ function renderCard() {
   card.offsetHeight; // reflow
   card.style.animation = '';
 
-  document.getElementById('wordReading').textContent = c.reading;
   document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
   document.getElementById('wordMeta').textContent = '（' + c.type + '）';
   document.getElementById('wordMeaning').textContent = c.meaning;
