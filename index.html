@@ -129,13 +129,6 @@
   .sentence-jp:hover { opacity: 0.8; }
   .sentence-empty { font-family: 'Courier New', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
 
-  .ktv-token { display: inline; color: var(--muted); opacity: 0.4; transition: color 0.08s, opacity 0.08s; }
-  .ktv-token ruby { display: ruby; }
-  .ktv-token ruby rt { display: ruby-text; font-size: 0.46em; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; transition: color 0.08s; }
-  .ktv-token.ktv-done { color: var(--ink-mid); opacity: 1; font-weight: 500; }
-  .ktv-token.ktv-done ruby rt { color: var(--ruby); }
-  .ktv-token.ktv-now { color: var(--yama); opacity: 1; font-weight: 700; text-shadow: 0 0 10px rgba(160,120,32,0.25); }
-  .ktv-token.ktv-now ruby rt { color: var(--yama); }
 
   .sent-cn-wrap { position: relative; cursor: pointer; }
   .sentence-meaning { font-size: 0.84rem; color: var(--muted); line-height: 1.75; text-wrap: pretty; }
@@ -710,7 +703,7 @@ const ALL_LESSONS = [...new Set(CARDS.map(c => c.lesson))].sort((a,b) => a-b);
 let filteredCards = [...CARDS];
 let current = 0, speed = 0.85;
 let isLooping = false, isPlaying = false, playingWhat = null;
-let loopTimer = null, ktvTimer = null;
+let loopTimer = null;
 let ttsVoice = null, ttsVoiceCN = null;
 
 function buildFilter() {
@@ -785,17 +778,6 @@ function renderRuby(s) {
   }).join('');
 }
 
-function renderKTV(s) {
-  if (!s) return '';
-  return s.split(' ').map((t, i) => {
-    if (!t.trim()) return '';
-    if (t.includes('|')) {
-      const [b, r] = t.split('|');
-      return `<span class="ktv-token" data-chars="${b.length}" data-i="${i}"><ruby>${b}<rt>${r}</rt></ruby></span>`;
-    }
-    return `<span class="ktv-token" data-chars="${t.length}" data-i="${i}">${t}</span>`;
-  }).join('');
-}
 
 function renderCard() {
   const c = filteredCards[current];
@@ -821,7 +803,7 @@ function renderCard() {
   document.getElementById('sentenceEmpty').style.display = hasS ? 'none' : 'block';
   document.getElementById('sentMeaningWrap').style.display = hasS ? '' : 'none';
   if (hasS) {
-    document.getElementById('sentenceJp').innerHTML = renderKTV(c.sentence);
+    document.getElementById('sentenceJp').innerHTML = renderRuby(c.sentence);
     document.getElementById('sentenceMeaning').textContent = c.sentenceMeaning || '';
   }
   document.getElementById('btnSent').disabled = !hasS;
@@ -838,27 +820,6 @@ function revealSentMeaning() { document.getElementById('sentMeaningWrap').classL
 function resetDots() { [1,2,3].forEach(i => document.getElementById('dot' + i).className = 'dot'); }
 function setDot(n, s) { document.getElementById('dot' + n).className = 'dot ' + s; }
 
-function startKTV() {
-  const tokens = [...document.querySelectorAll('.ktv-token')];
-  if (!tokens.length) return;
-  tokens.forEach(t => t.classList.remove('ktv-done', 'ktv-now'));
-  const msPerChar = 145 / speed;
-  let idx = 0;
-  function step() {
-    if (!isPlaying || idx >= tokens.length) return;
-    if (idx > 0) { tokens[idx-1].classList.remove('ktv-now'); tokens[idx-1].classList.add('ktv-done'); }
-    tokens[idx].classList.add('ktv-now');
-    const chars = parseInt(tokens[idx].dataset.chars) || 1;
-    idx++;
-    ktvTimer = setTimeout(step, chars * msPerChar);
-  }
-  step();
-}
-
-function stopKTV() {
-  clearTimeout(ktvTimer);
-  document.querySelectorAll('.ktv-token').forEach(t => t.classList.remove('ktv-done', 'ktv-now'));
-}
 
 function rawText(s) { return s.replace(/\|[^\s|]*/g, '').replace(/\s+/g, ''); }
 
@@ -866,7 +827,6 @@ function speakWord() { utter(filteredCards[current].word, 'ja-JP'); }
 function speakSentence() {
   const c = filteredCards[current];
   if (!c.sentence) return;
-  stopKTV(); startKTV();
   utter(rawText(c.sentence), 'ja-JP');
 }
 
@@ -923,7 +883,6 @@ function playSentence() {
     }
     setDot(rep, 'active');
     document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-    stopKTV(); startKTV();
     utter(sent, 'ja-JP', () => {
       if (!isPlaying) return;
       setDot(rep, 'done');
@@ -938,7 +897,7 @@ function stopPlay() {
   speechSynthesis.cancel && speechSynthesis.cancel();
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
-  stopKTV(); resetDots();
+  resetDots();
 }
 
 function finishPlay() {
@@ -946,7 +905,6 @@ function finishPlay() {
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatusText').textContent = '完成 ✓';
   setTimeout(() => { document.getElementById('playStatus').style.display = 'none'; }, 1200);
-  stopKTV();
   if (isLooping) {
     loopTimer = setTimeout(() => {
       if (!isLooping) return;
