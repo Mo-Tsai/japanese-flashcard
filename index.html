@@ -738,6 +738,7 @@ let filteredCards = [...CARDS];
 let current = 0, speed = 0.85;
 let isLooping = false, isPlaying = false, playingWhat = null;
 let loopTimer = null;
+let _playController = null;
 let _azToken = null, _azTokenExpiry = 0;
 let _currentAudio = null;
 
@@ -826,6 +827,52 @@ function utter(text, lang, onEnd) {
   });
 }
 
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
+    const t = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Aborted', 'AbortError')); }, { once: true });
+  });
+}
+
+function playAudioUrl(url, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
+    const audio = new Audio(url);
+    _currentAudio = audio;
+    audio.onended = () => { _currentAudio = null; resolve(); };
+    audio.onerror = () => { _currentAudio = null; reject(new Error('audio error')); };
+    signal?.addEventListener('abort', () => {
+      audio.pause(); _currentAudio = null;
+      reject(new DOMException('Aborted', 'AbortError'));
+    }, { once: true });
+    audio.play().catch(reject);
+  });
+}
+
+async function fetchTTSUrl(text, lang, signal) {
+  const key = localStorage.getItem('azureKey') || '';
+  const region = localStorage.getItem('azureRegion') || 'japaneast';
+  if (!key) return null;
+  const token = await _getToken(key, region);
+  if (!token) return null;
+  const voice = lang === 'ja-JP'
+    ? (localStorage.getItem('azureVoice') || 'ja-JP-NanamiNeural')
+    : 'zh-TW-HsiaoChenNeural';
+  const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='${lang}'><voice name='${voice}'><prosody rate='${_ssmlRate()}'>${_xmlEsc(text)}</prosody></voice></speak>`;
+  const resp = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+    method: 'POST', signal,
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/ssml+xml',
+      'X-Microsoft-OutputFormat': 'audio-24khz-160kbitrate-mono-mp3'
+    },
+    body: ssml
+  });
+  if (!resp.ok) return null;
+  return URL.createObjectURL(await resp.blob());
+}
+
 function getDictForm(word, reading, type) {
   if (!type || !type.match(/動/)) return null;
   const wEnds = word.endsWith('ます');
@@ -910,7 +957,7 @@ function speakSentence() {
   utter(rawText(c.sentence), 'ja-JP');
 }
 
-function playWord() {
+async function playWord() {
   if (isPlaying && playingWhat === 'word') { stopPlay(); return; }
   if (isPlaying) stopPlay();
   isPlaying = true; playingWhat = 'word';
@@ -919,28 +966,37 @@ function playWord() {
   resetDots();
   const c = filteredCards[current];
   const cnMode = document.getElementById('cnToggle').checked;
-  let rep = 0;
-  function round() {
-    if (!isPlaying) return;
-    if (++rep > 3) {
-      if (cnMode) {
-        document.getElementById('playStatusText').textContent = 'CN';
-        utter(c.meaning, 'zh-TW', () => { finishPlay(); });
-      } else { finishPlay(); }
-      return;
-    }
-    setDot(rep, 'active');
-    document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-    utter(c.word, 'ja-JP', () => {
-      if (!isPlaying) return;
+  if (_playController) _playController.abort();
+  _playController = new AbortController();
+  const { signal } = _playController;
+  let url = null;
+  try {
+    url = await fetchTTSUrl(c.word, 'ja-JP', signal);
+    if (!url) { finishPlay(); return; }
+    for (let rep = 1; rep <= 3; rep++) {
+      if (signal.aborted) break;
+      setDot(rep, 'active');
+      document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
+      await playAudioUrl(url, signal);
       setDot(rep, 'done');
-      setTimeout(() => { if (isPlaying) round(); }, 500);
-    });
+      if (rep < 3) await sleep(500, signal);
+    }
+    if (!signal.aborted && cnMode) {
+      document.getElementById('playStatusText').textContent = 'CN';
+      const cnUrl = await fetchTTSUrl(c.meaning, 'zh-TW', signal);
+      if (cnUrl) {
+        try { await playAudioUrl(cnUrl, signal); } finally { URL.revokeObjectURL(cnUrl); }
+      }
+    }
+    if (!signal.aborted) finishPlay();
+  } catch (e) {
+    if (e.name !== 'AbortError') finishPlay();
+  } finally {
+    if (url) URL.revokeObjectURL(url);
   }
-  round();
 }
 
-function playSentence() {
+async function playSentence() {
   const c = filteredCards[current];
   if (!c.sentence) return;
   if (isPlaying && playingWhat === 'sent') { stopPlay(); return; }
@@ -951,29 +1007,39 @@ function playSentence() {
   resetDots();
   const cnMode = document.getElementById('cnToggle').checked;
   const sent = rawText(c.sentence);
-  let rep = 0;
-  function round() {
-    if (!isPlaying) return;
-    if (++rep > 3) {
-      if (cnMode && c.sentenceMeaning) {
-        document.getElementById('playStatusText').textContent = 'CN';
-        utter(c.sentenceMeaning, 'zh-TW', () => { finishPlay(); });
-      } else { finishPlay(); }
-      return;
-    }
-    setDot(rep, 'active');
-    document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-    utter(sent, 'ja-JP', () => {
-      if (!isPlaying) return;
+  if (_playController) _playController.abort();
+  _playController = new AbortController();
+  const { signal } = _playController;
+  let url = null;
+  try {
+    url = await fetchTTSUrl(sent, 'ja-JP', signal);
+    if (!url) { finishPlay(); return; }
+    for (let rep = 1; rep <= 3; rep++) {
+      if (signal.aborted) break;
+      setDot(rep, 'active');
+      document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
+      await playAudioUrl(url, signal);
       setDot(rep, 'done');
-      setTimeout(() => { if (isPlaying) round(); }, 600);
-    });
+      if (rep < 3) await sleep(600, signal);
+    }
+    if (!signal.aborted && cnMode && c.sentenceMeaning) {
+      document.getElementById('playStatusText').textContent = 'CN';
+      const cnUrl = await fetchTTSUrl(c.sentenceMeaning, 'zh-TW', signal);
+      if (cnUrl) {
+        try { await playAudioUrl(cnUrl, signal); } finally { URL.revokeObjectURL(cnUrl); }
+      }
+    }
+    if (!signal.aborted) finishPlay();
+  } catch (e) {
+    if (e.name !== 'AbortError') finishPlay();
+  } finally {
+    if (url) URL.revokeObjectURL(url);
   }
-  round();
 }
 
 function stopPlay() {
   isPlaying = false; playingWhat = null;
+  if (_playController) { _playController.abort(); _playController = null; }
   if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
