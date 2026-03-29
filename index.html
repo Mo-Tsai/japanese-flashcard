@@ -356,7 +356,7 @@
 let filteredCards = [...CARDS];
 let current = 0, speed = 0.85;
 let isLooping = false, isPlaying = false, playingWhat = null;
-let loopTimer = null;
+let loopTimer = null, loopInnerTimer = null;
 let _playController = null;
 let _azToken = null, _azTokenExpiry = 0;
 let _currentAudio = null;
@@ -665,6 +665,8 @@ async function playSentence() {
 
 function stopPlay() {
   isPlaying = false; playingWhat = null;
+  clearTimeout(loopTimer); loopTimer = null;
+  clearTimeout(loopInnerTimer); loopInnerTimer = null;
   if (_playController) { _playController.abort(); _playController = null; }
   if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
   setBtnState('word', false); setBtnState('sent', false);
@@ -681,7 +683,7 @@ function finishPlay() {
     loopTimer = setTimeout(() => {
       if (!isLooping) return;
       nextCard();
-      setTimeout(() => { if (isLooping) playWord(); }, 600);
+      loopInnerTimer = setTimeout(() => { if (isLooping) playWord(); }, 600);
     }, 800);
   }
 }
@@ -705,7 +707,7 @@ function toggleLoop() {
   isLooping = document.getElementById('loopToggle').checked;
   document.getElementById('loopLabel').classList.toggle('active', isLooping);
   document.getElementById('loopBadge').classList.toggle('visible', isLooping);
-  if (!isLooping) clearTimeout(loopTimer);
+  if (!isLooping) { clearTimeout(loopTimer); loopTimer = null; clearTimeout(loopInnerTimer); loopInnerTimer = null; }
 }
 
 function setSpeed(s) {
