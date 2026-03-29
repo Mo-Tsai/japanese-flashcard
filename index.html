@@ -176,6 +176,30 @@
   .speed-btn { height: 24px; padding: 0 9px; font-family: 'Courier New', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid rgba(30,22,17,0.12); background: transparent; cursor: pointer; color: var(--muted); border-radius: 999px; transition: all 0.12s; display: flex; align-items: center; }
   .speed-btn.active { background: var(--shu); color: white; border-color: var(--shu); }
 
+  .gear-btn { background: none; border: 1px solid rgba(30,22,17,0.12); border-radius: 999px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: var(--muted); transition: all 0.14s; flex-shrink: 0; }
+  .gear-btn:hover { background: var(--bg2); color: var(--ink); }
+
+  .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(30,22,17,0.35); z-index: 100; }
+  .settings-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+  .settings-panel {
+    background: var(--card); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0;
+    padding: 24px 20px 32px; box-shadow: 0 -8px 32px rgba(30,22,17,0.12);
+    transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+  }
+  .settings-overlay.open .settings-panel { transform: translateY(0); }
+  .settings-title { font-size: 0.75rem; font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .settings-close { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); line-height: 1; }
+  .settings-row { margin-bottom: 14px; }
+  .settings-label { font-size: 0.7rem; font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px; display: block; }
+  .settings-input { width: 100%; padding: 8px 12px; border: 1px solid rgba(30,22,17,0.15); border-radius: 8px; font-size: 0.88rem; background: var(--bg); color: var(--ink); outline: none; box-sizing: border-box; }
+  .settings-input:focus { border-color: var(--shu); }
+  .settings-select { width: 100%; padding: 8px 12px; border: 1px solid rgba(30,22,17,0.15); border-radius: 8px; font-size: 0.88rem; background: var(--bg); color: var(--ink); outline: none; cursor: pointer; }
+  .settings-save { width: 100%; height: 40px; background: var(--shu); color: white; border: none; border-radius: 10px; font-size: 0.88rem; cursor: pointer; margin-top: 6px; transition: opacity 0.14s; }
+  .settings-save:active { opacity: 0.8; }
+  .tts-status { font-size: 0.68rem; font-family: 'Courier New', monospace; color: var(--muted); margin-top: 6px; min-height: 14px; }
+  .tts-status.ok { color: #4a7c59; }
+  .tts-status.err { color: #c0392b; }
+
   .nav-row { display: flex; align-items: center; gap: 8px; }
   .btn-nav { flex: 0.7; height: 38px; border: 1.5px solid rgba(30,22,17,0.12); background: transparent; cursor: pointer; font-size: 0.85rem; border-radius: 999px; transition: all 0.14s; display: flex; align-items: center; justify-content: center; color: var(--ink-mid); }
   .btn-nav:hover { background: var(--bg2); }
@@ -263,6 +287,32 @@
   </div>
 </div>
 
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOutside(event)">
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-title">
+      <span>TTS 語音設定</span>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-row">
+      <label class="settings-label">Azure Subscription Key</label>
+      <input class="settings-input" type="password" id="azureKeyInput" placeholder="貼上你的 Key…" autocomplete="off">
+    </div>
+    <div class="settings-row">
+      <label class="settings-label">Region</label>
+      <input class="settings-input" type="text" id="azureRegionInput" placeholder="japaneast" autocomplete="off">
+    </div>
+    <div class="settings-row">
+      <label class="settings-label">日文語音</label>
+      <select class="settings-select" id="azureVoiceSelect">
+        <option value="ja-JP-NanamiNeural">Nanami（女）</option>
+        <option value="ja-JP-KeitaNeural">Keita（男）</option>
+      </select>
+    </div>
+    <button class="settings-save" onclick="saveSettings()">儲存並測試</button>
+    <div class="tts-status" id="ttsStatus"></div>
+  </div>
+</div>
+
 <div class="controls">
   <div class="controls-top">
     <div class="tog-group">
@@ -282,6 +332,7 @@
       <button class="speed-btn" onclick="setSpeed(0.6)" id="spd06">Slow</button>
       <button class="speed-btn active" onclick="setSpeed(0.85)" id="spd085">Mid</button>
       <button class="speed-btn" onclick="setSpeed(1.0)" id="spd10">Fast</button>
+      <button class="gear-btn" onclick="openSettings()" title="TTS 設定">⚙</button>
     </div>
   </div>
   <div class="nav-row">
@@ -687,7 +738,8 @@ let filteredCards = [...CARDS];
 let current = 0, speed = 0.85;
 let isLooping = false, isPlaying = false, playingWhat = null;
 let loopTimer = null;
-let ttsVoice = null, ttsVoiceCN = null;
+let _azToken = null, _azTokenExpiry = 0;
+let _currentAudio = null;
 
 function buildFilter() {
   const el = document.getElementById('lessonFilter');
@@ -708,27 +760,69 @@ function filterLesson(l) {
 }
 
 function initTTS() {
-  if (!('speechSynthesis' in window)) return;
-  const load = () => {
-    const voices = speechSynthesis.getVoices();
-    const ja = voices.filter(v => v.lang.startsWith('ja'));
-    const zh = voices.filter(v => v.lang.startsWith('zh'));
-    if (ja.length) ttsVoice = ja.find(v => /Kyoko|O-Ren|Female|female/i.test(v.name)) || ja[0];
-    if (zh.length) ttsVoiceCN = zh.find(v => /TW|HK|Traditional/i.test(v.name)) || zh[0];
-  };
-  speechSynthesis.getVoices().length ? load() : (speechSynthesis.onvoiceschanged = load);
+  const k = localStorage.getItem('azureKey') || '';
+  const r = localStorage.getItem('azureRegion') || 'japaneast';
+  const v = localStorage.getItem('azureVoice') || 'ja-JP-NanamiNeural';
+  document.getElementById('azureKeyInput').value = k;
+  document.getElementById('azureRegionInput').value = r;
+  document.getElementById('azureVoiceSelect').value = v;
+}
+
+async function _getToken(key, region) {
+  if (_azToken && Date.now() < _azTokenExpiry) return _azToken;
+  try {
+    const res = await fetch(`https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, {
+      method: 'POST', headers: { 'Ocp-Apim-Subscription-Key': key }
+    });
+    if (!res.ok) return null;
+    _azToken = await res.text();
+    _azTokenExpiry = Date.now() + 9 * 60 * 1000;
+    return _azToken;
+  } catch { return null; }
+}
+
+function _ssmlRate() {
+  if (speed <= 0.65) return '-25%';
+  if (speed <= 0.9)  return '-8%';
+  return '0%';
+}
+
+function _xmlEsc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
 function utter(text, lang, onEnd) {
-  if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang; u.rate = speed; u.pitch = 1.0;
-  if (lang === 'ja-JP' && ttsVoice) u.voice = ttsVoice;
-  if (lang === 'zh-TW' && ttsVoiceCN) u.voice = ttsVoiceCN;
-  u.onend = () => { if (onEnd) onEnd(); };
-  u.onerror = () => { if (onEnd) onEnd(); };
-  speechSynthesis.speak(u);
+  const key = localStorage.getItem('azureKey') || '';
+  const region = localStorage.getItem('azureRegion') || 'japaneast';
+  if (!key) { if (onEnd) onEnd(); return; }
+
+  if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+
+  const voice = lang === 'ja-JP'
+    ? (localStorage.getItem('azureVoice') || 'ja-JP-NanamiNeural')
+    : 'zh-TW-HsiaoChenNeural';
+
+  const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='${lang}'><voice name='${voice}'><prosody rate='${_ssmlRate()}'>${_xmlEsc(text)}</prosody></voice></speak>`;
+
+  _getToken(key, region).then(token => {
+    if (!token) { if (onEnd) onEnd(); return; }
+    fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-24khz-160kbitrate-mono-mp3'
+      },
+      body: ssml
+    }).then(r => r.blob()).then(blob => {
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      _currentAudio = audio;
+      audio.onended = () => { URL.revokeObjectURL(url); _currentAudio = null; if (onEnd) onEnd(); };
+      audio.onerror = () => { URL.revokeObjectURL(url); _currentAudio = null; if (onEnd) onEnd(); };
+      audio.play().catch(() => { _currentAudio = null; if (onEnd) onEnd(); });
+    }).catch(() => { if (onEnd) onEnd(); });
+  });
 }
 
 function getDictForm(word, reading, type) {
@@ -878,7 +972,7 @@ function playSentence() {
 
 function stopPlay() {
   isPlaying = false; playingWhat = null;
-  speechSynthesis.cancel && speechSynthesis.cancel();
+  if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
   resetDots();
@@ -935,6 +1029,31 @@ document.getElementById('card').addEventListener('touchend', e => {
 }, {passive:true});
 
 
+
+function openSettings() {
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+}
+function saveSettings() {
+  const key = document.getElementById('azureKeyInput').value.trim();
+  const region = document.getElementById('azureRegionInput').value.trim() || 'japaneast';
+  const voice = document.getElementById('azureVoiceSelect').value;
+  localStorage.setItem('azureKey', key);
+  localStorage.setItem('azureRegion', region);
+  localStorage.setItem('azureVoice', voice);
+  _azToken = null; _azTokenExpiry = 0; // reset token cache
+  const st = document.getElementById('ttsStatus');
+  if (!key) { st.className = 'tts-status err'; st.textContent = '請輸入 Key'; return; }
+  st.className = 'tts-status'; st.textContent = '連線測試中…';
+  utter('テスト', 'ja-JP', () => {
+    st.className = 'tts-status ok'; st.textContent = '✓ 連線成功';
+  });
+}
 
 initTTS(); buildFilter(); renderCard();
 </script>
