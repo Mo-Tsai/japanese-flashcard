@@ -683,6 +683,7 @@ async function playWord() {
 }
 
 async function playSentence() {
+  if (loopTimer !== null || loopInnerTimer !== null) { stopPlay(); return; }
   const c = filteredCards[current];
   if (!c.sentence) return;
   if (isPlaying && playingWhat === 'sent') { stopPlay(); return; }
@@ -736,6 +737,7 @@ function stopPlay() {
 }
 
 function finishPlay() {
+  const wasPlaying = playingWhat;
   isPlaying = false; playingWhat = null;
   if (isLooping) {
     // Keep button in ■ state during loop gap — user can click to stop
@@ -750,7 +752,7 @@ function finishPlay() {
       nextCard();
       loopInnerTimer = setTimeout(() => {
         loopInnerTimer = null;
-        if (isLooping) playWord();
+        if (isLooping) { if (wasPlaying === 'sent') playSentence(); else playWord(); }
         else { setBtnState('word', false); setBtnState('sent', false); document.getElementById('playStatus').style.display = 'none'; }
       }, 600);
     }, 800);
