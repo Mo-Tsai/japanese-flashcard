@@ -716,6 +716,7 @@ function finishPlay() {
     // Keep button in ■ state during loop gap — user can click to stop
     document.getElementById('playStatusText').textContent = '↻ 下一張…';
     loopTimer = setTimeout(() => {
+      loopTimer = null;
       if (!isLooping) {
         setBtnState('word', false); setBtnState('sent', false);
         document.getElementById('playStatus').style.display = 'none';
@@ -723,6 +724,7 @@ function finishPlay() {
       }
       nextCard();
       loopInnerTimer = setTimeout(() => {
+        loopInnerTimer = null;
         if (isLooping) playWord();
         else { setBtnState('word', false); setBtnState('sent', false); document.getElementById('playStatus').style.display = 'none'; }
       }, 600);
