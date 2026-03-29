@@ -746,7 +746,8 @@ function buildFilter() {
   ALL_LESSONS.forEach(l => {
     const b = document.createElement('button');
     b.className = 'lbtn'; b.id = 'btnL' + l;
-    b.textContent = '第' + l + '課';
+    const LABELS = { 100: 'N5' };
+    b.textContent = LABELS[l] || ('第' + l + '課');
     b.onclick = () => filterLesson(l);
     el.appendChild(b);
   });
@@ -864,7 +865,8 @@ function renderCard() {
   document.getElementById('meaningWrap').classList.remove('revealed');
   document.getElementById('sentMeaningWrap').classList.remove('revealed');
 
-  document.getElementById('lessonNum').textContent = '第 ' + c.lesson + ' 課';
+  const CARD_LABELS = { 100: 'N5' };
+  document.getElementById('lessonNum').textContent = CARD_LABELS[c.lesson] || ('第 ' + c.lesson + ' 課');
   document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
   document.getElementById('wordMeta').textContent = c.type;
   document.getElementById('wordMeaning').textContent = c.meaning;
