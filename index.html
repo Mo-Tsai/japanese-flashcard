@@ -61,6 +61,10 @@
     -webkit-overflow-scrolling: touch;
   }
   .lesson-filter::-webkit-scrollbar { display: none; }
+  .search-wrap { padding: 7px 12px; background: var(--card); border-bottom: 1px solid rgba(30,22,17,0.06); }
+  .search-input { width: 100%; box-sizing: border-box; padding: 6px 10px; border: 1px solid rgba(30,22,17,0.12); border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 0.82rem; background: var(--bg); color: var(--ink); outline: none; }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: var(--shu); }
   .lbtn {
     flex-shrink: 0; padding: 9px 11px;
     font-family: 'Courier New', monospace; font-size: 0.62rem;
@@ -237,7 +241,12 @@
 
 <div class="lesson-filter-wrap">
   <div class="lesson-filter" id="lessonFilter">
-    <button class="lbtn active" onclick="filterLesson(0)" id="btnAll">ALL</button>
+    <button class="lbtn active" onclick="filterLevel('all')" id="btnAll">ALL</button>
+    <button class="lbtn" onclick="filterLevel('N5')" id="btnN5">N5</button>
+    <button class="lbtn" onclick="filterLevel('N4')" id="btnN4">N4</button>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input" placeholder="搜尋單字・讀音・中文…" oninput="applyFilter()">
   </div>
 </div>
 
@@ -245,8 +254,7 @@
   <div class="card" id="card">
     <div class="card-top">
       <div class="lesson-badge">
-        <span class="lesson-label">課</span>
-        <span class="lesson-pill" id="lessonNum">第 1 課</span>
+        <span class="lesson-pill" id="levelBadge">N5</span>
       </div>
       <div class="loop-badge" id="loopBadge">🔁 輪播中</div>
     </div>
@@ -733,8 +741,8 @@ const CARDS = [
 ];
 
 
-const ALL_LESSONS = [...new Set(CARDS.map(c => c.lesson))].sort((a,b) => a-b);
 let filteredCards = [...CARDS];
+let currentLevel = 'all';
 let current = 0, speed = 0.85;
 let isLooping = false, isPlaying = false, playingWhat = null;
 let loopTimer = null;
@@ -742,22 +750,21 @@ let _playController = null;
 let _azToken = null, _azTokenExpiry = 0;
 let _currentAudio = null;
 
-function buildFilter() {
-  const el = document.getElementById('lessonFilter');
-  ALL_LESSONS.forEach(l => {
-    const b = document.createElement('button');
-    b.className = 'lbtn'; b.id = 'btnL' + l;
-    const LABELS = { 100: 'N5' };
-    b.textContent = LABELS[l] || ('第' + l + '課');
-    b.onclick = () => filterLesson(l);
-    el.appendChild(b);
-  });
+function filterLevel(lv) {
+  currentLevel = lv;
+  document.querySelectorAll('.lbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById(lv === 'all' ? 'btnAll' : 'btn' + lv).classList.add('active');
+  applyFilter();
 }
 
-function filterLesson(l) {
-  document.querySelectorAll('.lbtn').forEach(b => b.classList.remove('active'));
-  document.getElementById(l === 0 ? 'btnAll' : 'btnL' + l).classList.add('active');
-  filteredCards = l === 0 ? [...CARDS] : CARDS.filter(c => c.lesson === l);
+function applyFilter() {
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  filteredCards = CARDS.filter(c => {
+    if (currentLevel !== 'all' && c.level !== currentLevel) return false;
+    if (!q) return true;
+    return c.word.includes(q) || c.reading.includes(q) ||
+           c.meaning.toLowerCase().includes(q) || (c.meaningEn || '').toLowerCase().includes(q);
+  });
   current = 0; renderCard();
 }
 
@@ -906,14 +913,22 @@ function renderRuby(s) {
 
 function renderCard() {
   const c = filteredCards[current];
+  if (!c) {
+    document.getElementById('wordMain').innerHTML = '無結果';
+    document.getElementById('wordMeta').textContent = '';
+    document.getElementById('wordMeaning').textContent = '';
+    document.getElementById('wordMeaningEn').textContent = '';
+    document.getElementById('headerCounter').textContent = '0 / 0';
+    document.getElementById('progressFill').style.width = '0%';
+    return;
+  }
   const el = document.getElementById('card');
   el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
 
   document.getElementById('meaningWrap').classList.remove('revealed');
   document.getElementById('sentMeaningWrap').classList.remove('revealed');
 
-  const CARD_LABELS = { 100: 'N5' };
-  document.getElementById('lessonNum').textContent = CARD_LABELS[c.lesson] || ('第 ' + c.lesson + ' 課');
+  document.getElementById('levelBadge').textContent = c.level || '';
   document.getElementById('wordMain').innerHTML = renderRuby(c.ruby);
   document.getElementById('wordMeta').textContent = c.type;
   document.getElementById('wordMeaning').textContent = c.meaning;
@@ -1123,7 +1138,7 @@ function saveSettings() {
   });
 }
 
-initTTS(); buildFilter(); renderCard();
+initTTS(); renderCard();
 </script>
 </body>
 </html>
