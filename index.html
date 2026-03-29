@@ -366,7 +366,7 @@ let isLooping = false, isPlaying = false, playingWhat = null;
 let loopTimer = null, loopInnerTimer = null;
 let _playController = null;
 let _azToken = null, _azTokenExpiry = 0;
-let _currentAudio = null;
+const _audioEl = new Audio();
 
 function cardKey(c) { return c.word + '||' + c.reading; }
 
@@ -488,18 +488,41 @@ function sleep(ms, signal) {
   });
 }
 
-function playAudioUrl(url, signal) {
+function loadAudio(url, signal) {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
-    const audio = new Audio(url);
-    _currentAudio = audio;
-    audio.onended = () => { _currentAudio = null; resolve(); };
-    audio.onerror = () => { _currentAudio = null; reject(new Error('audio error')); };
-    signal?.addEventListener('abort', () => {
-      audio.pause(); _currentAudio = null;
-      reject(new DOMException('Aborted', 'AbortError'));
-    }, { once: true });
-    audio.play().catch(reject);
+    _audioEl.src = url;
+    const onReady = () => { cleanup(); resolve(); };
+    const onErr   = () => { cleanup(); reject(new Error('audio load error')); };
+    const onAbort = () => { cleanup(); _audioEl.pause(); reject(new DOMException('Aborted', 'AbortError')); };
+    function cleanup() {
+      _audioEl.removeEventListener('canplaythrough', onReady);
+      _audioEl.removeEventListener('error', onErr);
+      signal?.removeEventListener('abort', onAbort);
+    }
+    _audioEl.addEventListener('canplaythrough', onReady, { once: true });
+    _audioEl.addEventListener('error', onErr, { once: true });
+    signal?.addEventListener('abort', onAbort, { once: true });
+    _audioEl.load();
+  });
+}
+
+function playOnce(signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
+    const onEnded = () => { cleanup(); resolve(); };
+    const onErr   = () => { cleanup(); reject(new Error('audio play error')); };
+    const onAbort = () => { cleanup(); _audioEl.pause(); reject(new DOMException('Aborted', 'AbortError')); };
+    function cleanup() {
+      _audioEl.removeEventListener('ended', onEnded);
+      _audioEl.removeEventListener('error', onErr);
+      signal?.removeEventListener('abort', onAbort);
+    }
+    _audioEl.addEventListener('ended', onEnded, { once: true });
+    _audioEl.addEventListener('error', onErr, { once: true });
+    signal?.addEventListener('abort', onAbort, { once: true });
+    _audioEl.currentTime = 0;
+    _audioEl.play().catch(e => { cleanup(); reject(e); });
   });
 }
 
@@ -635,11 +658,12 @@ async function playWord() {
   try {
     url = await fetchTTSUrl(c.word, 'ja-JP', signal);
     if (!url) { finishPlay(); return; }
+    await loadAudio(url, signal);
     for (let rep = 1; rep <= 3; rep++) {
       if (signal.aborted) break;
       setDot(rep, 'active');
       document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-      await playAudioUrl(url, signal);
+      await playOnce(signal);
       setDot(rep, 'done');
       if (rep < 3) await sleep(500, signal);
     }
@@ -647,7 +671,7 @@ async function playWord() {
       document.getElementById('playStatusText').textContent = 'CN';
       const cnUrl = await fetchTTSUrl(c.meaning, 'zh-TW', signal);
       if (cnUrl) {
-        try { await playAudioUrl(cnUrl, signal); } finally { URL.revokeObjectURL(cnUrl); }
+        try { await loadAudio(cnUrl, signal); await playOnce(signal); } finally { URL.revokeObjectURL(cnUrl); }
       }
     }
     if (!signal.aborted) finishPlay();
@@ -676,11 +700,12 @@ async function playSentence() {
   try {
     url = await fetchTTSUrl(sent, 'ja-JP', signal);
     if (!url) { finishPlay(); return; }
+    await loadAudio(url, signal);
     for (let rep = 1; rep <= 3; rep++) {
       if (signal.aborted) break;
       setDot(rep, 'active');
       document.getElementById('playStatusText').textContent = '第 ' + rep + ' 次';
-      await playAudioUrl(url, signal);
+      await playOnce(signal);
       setDot(rep, 'done');
       if (rep < 3) await sleep(600, signal);
     }
@@ -688,7 +713,7 @@ async function playSentence() {
       document.getElementById('playStatusText').textContent = 'CN';
       const cnUrl = await fetchTTSUrl(c.sentenceMeaning, 'zh-TW', signal);
       if (cnUrl) {
-        try { await playAudioUrl(cnUrl, signal); } finally { URL.revokeObjectURL(cnUrl); }
+        try { await loadAudio(cnUrl, signal); await playOnce(signal); } finally { URL.revokeObjectURL(cnUrl); }
       }
     }
     if (!signal.aborted) finishPlay();
@@ -704,7 +729,7 @@ function stopPlay() {
   clearTimeout(loopTimer); loopTimer = null;
   clearTimeout(loopInnerTimer); loopInnerTimer = null;
   if (_playController) { _playController.abort(); _playController = null; }
-  if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+  _audioEl.pause();
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
   resetDots();
