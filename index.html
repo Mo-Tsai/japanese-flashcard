@@ -619,6 +619,7 @@ function speakSentence() {
 }
 
 async function playWord() {
+  if (loopTimer !== null || loopInnerTimer !== null) { stopPlay(); return; }
   if (isPlaying && playingWhat === 'word') { stopPlay(); return; }
   if (isPlaying) stopPlay();
   isPlaying = true; playingWhat = 'word';
@@ -711,15 +712,25 @@ function stopPlay() {
 
 function finishPlay() {
   isPlaying = false; playingWhat = null;
-  setBtnState('word', false); setBtnState('sent', false);
-  document.getElementById('playStatusText').textContent = '完成 ✓';
-  setTimeout(() => { document.getElementById('playStatus').style.display = 'none'; }, 1200);
   if (isLooping) {
+    // Keep button in ■ state during loop gap — user can click to stop
+    document.getElementById('playStatusText').textContent = '↻ 下一張…';
     loopTimer = setTimeout(() => {
-      if (!isLooping) return;
+      if (!isLooping) {
+        setBtnState('word', false); setBtnState('sent', false);
+        document.getElementById('playStatus').style.display = 'none';
+        return;
+      }
       nextCard();
-      loopInnerTimer = setTimeout(() => { if (isLooping) playWord(); }, 600);
+      loopInnerTimer = setTimeout(() => {
+        if (isLooping) playWord();
+        else { setBtnState('word', false); setBtnState('sent', false); document.getElementById('playStatus').style.display = 'none'; }
+      }, 600);
     }, 800);
+  } else {
+    setBtnState('word', false); setBtnState('sent', false);
+    document.getElementById('playStatusText').textContent = '完成 ✓';
+    setTimeout(() => { document.getElementById('playStatus').style.display = 'none'; }, 1200);
   }
 }
 
