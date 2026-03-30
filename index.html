@@ -674,7 +674,7 @@ function setDot(n, s) { document.getElementById('dot' + n).className = 'dot ' + 
 
 function rawText(s) { return s.replace(/\|[^\s|]*/g, '').replace(/\s+/g, ''); }
 
-function speakWord() { utter(filteredCards[current].word, 'ja-JP'); }
+function speakWord() { const c = filteredCards[current]; utter(c.reading || c.word, 'ja-JP'); }
 function speakSentence() {
   const c = filteredCards[current];
   if (!c.sentence) return;
@@ -696,7 +696,7 @@ async function playWord() {
   const { signal } = _playController;
   let url = null;
   try {
-    url = await fetchTTSUrl(c.word, 'ja-JP', signal);
+    url = await fetchTTSUrl(c.reading || c.word, 'ja-JP', signal);
     if (!url) { finishPlay(); return; }
     await loadAudio(url, signal);
     for (let rep = 1; rep <= 3; rep++) {
