@@ -685,7 +685,16 @@ async function playWord() {
 async function playSentence() {
   if (loopTimer !== null || loopInnerTimer !== null) { stopPlay(); return; }
   const c = filteredCards[current];
-  if (!c.sentence) return;
+  if (!c || !c.sentence) {
+    // No sentence on this card — keep loop going
+    if (isLooping) {
+      isPlaying = true; playingWhat = 'sent';
+      setBtnState('sent', true);
+      document.getElementById('playStatus').style.display = 'flex';
+      finishPlay();
+    }
+    return;
+  }
   if (isPlaying && playingWhat === 'sent') { stopPlay(); return; }
   if (isPlaying) stopPlay();
   isPlaying = true; playingWhat = 'sent';
