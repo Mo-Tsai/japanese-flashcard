@@ -226,6 +226,28 @@
   .btn-sent.playing { background: var(--kon); color: white; border-color: transparent; }
   .btn-sent:disabled { opacity: 0.3; cursor: not-allowed; }
 
+  .btn-mic {
+    flex: 0.9; height: 38px; border: 1.5px solid rgba(30,22,17,0.12);
+    background: transparent; cursor: pointer; font-size: 0.72rem;
+    border-radius: 999px; transition: all 0.14s;
+    display: flex; align-items: center; justify-content: center; gap: 3px;
+    color: var(--ink-mid); font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+  }
+  .btn-mic:hover { background: var(--bg2); }
+  .btn-mic.listening { background: #fdecea; border-color: #c0392b; color: #c0392b; }
+  .sr-result {
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: var(--card); border-radius: 10px; padding: 6px 14px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 0.85rem;
+    box-shadow: 0 0 0 1px var(--ring), 0 4px 16px rgba(30,22,17,0.1);
+    white-space: nowrap; pointer-events: none; margin-bottom: 6px;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .sr-result.show { opacity: 1; }
+  .sr-result.correct { color: #4a7c59; }
+  .sr-result.wrong   { color: #c0392b; }
+
 </style>
 </head>
 <body>
@@ -322,7 +344,8 @@
   </div>
 </div>
 
-<div class="controls">
+<div class="controls" style="position:relative">
+  <div class="sr-result" id="srResult"></div>
   <div class="controls-top">
     <div class="tog-group">
       <label class="tog-label" id="loopLabel">
@@ -353,6 +376,7 @@
     <button class="btn-play btn-sent" id="btnSent" onclick="playSentence()">
       <span id="btnSentIcon">▶</span><span id="btnSentText">例句</span>
     </button>
+    <button class="btn-mic" id="btnMic" onclick="toggleRecording()">🎤 Speak</button>
     <button class="btn-nav" onclick="nextCard()">▶</button>
   </div>
 </div>
@@ -836,6 +860,88 @@ function saveSettings() {
 }
 
 initTTS(); applyFilter(); updateDismissCount();
+
+// ── Speech Recognition ────────────────────────────────────────────────────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isRecording = false;
+let _srResultTimer = null;
+
+function toggleRecording() {
+  if (!SR) { alert('此瀏覽器不支援語音辨識，請用 Chrome。'); return; }
+  if (isRecording) { stopRecording(); return; }
+  startRecording();
+}
+
+function startRecording() {
+  if (isRecording || !SR) return;
+  isRecording = true;
+  document.getElementById('btnMic').classList.add('listening');
+  document.getElementById('btnMic').textContent = '🔴 Listening…';
+
+  recognition = new SR();
+  recognition.lang = 'ja-JP';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+  recognition.continuous = false;
+
+  recognition.onresult = (e) => {
+    // Try all alternatives for best match
+    const c = filteredCards[current];
+    if (!c) { resetRecordBtn(); return; }
+    let matched = false;
+    for (let alt = 0; alt < e.results[0].length; alt++) {
+      const text = e.results[0][alt].transcript.trim();
+      if (checkAnswer(text, c)) { matched = true; break; }
+    }
+    if (!matched) {
+      const first = e.results[0][0].transcript.trim();
+      showSRResult(first, false);
+    }
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error !== 'no-speech') console.warn('SR error', e.error);
+    resetRecordBtn();
+  };
+
+  recognition.onend = () => { resetRecordBtn(); };
+  recognition.start();
+}
+
+function stopRecording() {
+  if (!isRecording || !recognition) return;
+  recognition.stop();
+}
+
+function resetRecordBtn() {
+  isRecording = false;
+  recognition = null;
+  const btn = document.getElementById('btnMic');
+  btn.classList.remove('listening');
+  btn.textContent = '🎤 Speak';
+}
+
+function checkAnswer(text, card) {
+  // Normalize: remove spaces, fullwidth→halfwidth
+  const norm = s => s.replace(/\s/g, '').normalize('NFKC').toLowerCase();
+  const input = norm(text);
+  const word = norm(card.word);
+  const reading = norm(card.reading);
+  if (input === word || input === reading) {
+    showSRResult('✓ ' + text, true);
+    return true;
+  }
+  return false;
+}
+
+function showSRResult(text, correct) {
+  const el = document.getElementById('srResult');
+  el.textContent = text;
+  el.className = 'sr-result show ' + (correct ? 'correct' : 'wrong');
+  clearTimeout(_srResultTimer);
+  _srResultTimer = setTimeout(() => { el.className = 'sr-result'; }, 2200);
+}
 </script>
 </body>
 </html>
