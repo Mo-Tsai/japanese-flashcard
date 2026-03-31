@@ -718,6 +718,10 @@ async function playWord() {
         try { await loadAudio(cnUrl, signal); await playOnce(signal); } finally { URL.revokeObjectURL(cnUrl); }
       }
     }
+    if (!signal.aborted && c.meaningEn) {
+      document.getElementById('playStatusText').textContent = 'EN';
+      await speakEnglish(c.meaningEn, signal);
+    }
     if (!signal.aborted) finishPlay();
   } catch (e) {
     if (e.name !== 'AbortError') finishPlay();
@@ -770,6 +774,10 @@ async function playSentence() {
         try { await loadAudio(cnUrl, signal); await playOnce(signal); } finally { URL.revokeObjectURL(cnUrl); }
       }
     }
+    if (!signal.aborted && c.sentenceMeaningEn) {
+      document.getElementById('playStatusText').textContent = 'EN';
+      await speakEnglish(c.sentenceMeaningEn, signal);
+    }
     if (!signal.aborted) finishPlay();
   } catch (e) {
     if (e.name !== 'AbortError') finishPlay();
@@ -778,12 +786,29 @@ async function playSentence() {
   }
 }
 
+// ── Web Speech API (English TTS, no API key needed) ──────────────────────────
+function speakEnglish(text, signal) {
+  return new Promise((resolve, reject) => {
+    if (!text || !window.speechSynthesis) { resolve(); return; }
+    if (signal?.aborted) { resolve(); return; }
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'en-US';
+    utt.rate = 0.9;
+    utt.onend = () => resolve();
+    utt.onerror = (e) => { if (e.error !== 'interrupted') reject(e); else resolve(); };
+    signal?.addEventListener('abort', () => { speechSynthesis.cancel(); resolve(); }, { once: true });
+    speechSynthesis.speak(utt);
+  });
+}
+
 function stopPlay() {
   isPlaying = false; playingWhat = null;
   clearTimeout(loopTimer); loopTimer = null;
   clearTimeout(loopInnerTimer); loopInnerTimer = null;
   if (_playController) { _playController.abort(); _playController = null; }
   _audioEl.pause();
+  speechSynthesis.cancel();
   setBtnState('word', false); setBtnState('sent', false);
   document.getElementById('playStatus').style.display = 'none';
   resetDots();
